@@ -88,7 +88,6 @@ header{
   pointer-events:none;
 }
 .search-suggest{
-.search-suggest{
   position:absolute;
   left:0;
   right:0;
@@ -102,12 +101,9 @@ header{
   max-height:220px;
   overflow:auto;
   box-shadow:0 14px 30px rgba(0,0,0,0.7);
-  z-index: 9999;                 
-  pointer-events:auto;
-
   display:none;
+  z-index:30;
 }
-
 .search-suggest li{
   padding:6px 12px;
   font-size:14px;
@@ -221,9 +217,7 @@ header{
   max-width:240px;
   box-shadow:0 10px 24px rgba(0,0,0,0.7);
   transition:opacity .16s ease, transform .16s ease;
-  z-index: 99999; 
-}
-
+  z-index:40;
 }
 .badge[data-tooltip]:hover::after{
   opacity:1;
