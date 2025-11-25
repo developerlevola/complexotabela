@@ -38,12 +38,6 @@ header{
 .brand h1{margin:0;font-size:26px;color:var(--orange);letter-spacing:.4px;text-shadow:0 0 8px rgba(255,170,1,0.08)}
 .brand p{margin:0;font-size:13px;color:#d6d6d6}
 
-/* admin button top-right */
-.header-actions{display:flex;gap:10px;align-items:center}
-.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
-.btn-primary{background:var(--orange);color:#000;font-weight:800;box-shadow:0 8px 36px rgba(255,170,1,0.12)}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--orange)}
-
 /* main layout */
 .wrap{max-width:1150px;margin:18px auto;padding:12px 20px}
 .section{margin-bottom:36px;opacity:0;transform:translateY(28px);transition:0.7s cubic-bezier(.2,.9,.3,1)}
@@ -59,31 +53,13 @@ header{
 /* table */
 .table{margin-top:14px;border-collapse:collapse;width:100%;background:linear-gradient(180deg,#0c0c0c,#070707);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
 .table th{background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800}
-.table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff} /* <-- A cor padrão continua aqui, mas o JS irá reforçar */
+.table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff}
 .category{margin-top:26px;font-size:20px;color:var(--orange);font-weight:800;margin-bottom:10px}
 .tr-hover:hover td{background:#0f0f0f}
 
-/* modal / admin */
+/* modal */
 .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1500}
 .modal{background:linear-gradient(180deg,#0b0b0b,#0a0a0a);border-radius:12px;padding:18px;max-width:1100px;width:96%;box-shadow:0 14px 40px rgba(0,0,0,0.7),0 0 28px rgba(255,170,1,0.08);color:#ddd}
-
-/* admin list/editor */
-.admin-list{max-height:55vh;overflow:auto;padding-right:6px}
-.admin-item{background:#0f0f0f;padding:12px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.02)}
-.admin-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-.input-inline{background:#111;border:1px solid rgba(255,255,255,0.03);color:#fff;padding:8px;border-radius:8px}
-
-/* small controls */
-.controls-row{display:flex;gap:8px;align-items:center}
-.file-input{display:none}
-
-/* logs */
-.log-list{max-height:220px;overflow:auto;background:#090909;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
-.log-item{font-size:13px;color:#cfcfcf;padding:6px;border-bottom:1px dashed rgba(255,255,255,0.02)}
-
-/* little helpers */
-.kv{font-size:13px;color:#bfbfbf}
-.btn-small{padding:6px 8px;border-radius:8px;border:0}
 
 /* responsive */
 @media (max-width:720px){
@@ -99,15 +75,11 @@ header{
 <header>
   <div class="header-inner">
     <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
+      <div class="logo"></div>
       <div>
         <h1>Complexo RJ — Tabela de Punições</h1>
         <p class="lead">Guia transparente de penalidades e regras aplicadas na comunidade</p>
       </div>
-    </div>
-
-    <div class="header-actions">
-      <button id="openAdminBtn" class="btn btn-primary" title="Painel Admin">Painel Admin</button>
     </div>
   </div>
 </header>
@@ -115,95 +87,53 @@ header{
 <main class="wrap">
   <section class="section">
     <div class="title">Tabela de Punições</div>
-    <p class="lead">A Tabela de Punições do Complexo RJ foi criada com o objetivo de manter a ordem, disciplina e o bom funcionamento da nossa comunidade. Cada membro deve respeitar as diretrizes para um ambiente justo e organizado.</p>
+    <p class="lead">A Tabela de Punições do Complexo RJ foi criada com o objetivo de manter a ordem, disciplina e o bom funcionamento da nossa comunidade.</p>
   </section>
 
   <section class="section search-wrap">
     <div class="search-box">
-      <input id="searchField" placeholder="Pesquisar infração, punição ou categoria (ex.: RDM, Banimento)..." />
+      <input id="searchField" placeholder="Pesquisar infração, punição ou categoria..." />
     </div>
   </section>
 
   <section id="contentArea" class="section"></section>
 </main>
 
-<div id="loginModal" class="modal-back" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
-    <h3 style="color:var(--orange);margin:0 0 10px">Login Administrativo</h3>
-    <p style="color:#cfcfcf;margin:0 0 12px">Insira a senha para acessar o painel.</p>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="adminPass" type="password" placeholder="Senha" class="input-inline" style="flex:1" />
-      <button id="loginBtn" class="btn btn-primary">Entrar</button>
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:12px">
-      <button id="loginClose" class="btn btn-ghost">Fechar</button>
-    </div>
-  </div>
-</div>
-
-<div id="adminModal" class="modal-back" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
-    <h3 style="color:var(--orange);margin:0 0 10px">Painel Administrativo</h3>
-
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-      <button id="addNewBtn" class="btn btn-primary">+ Nova Punição</button>
-      <label class="btn btn-ghost" style="cursor:pointer">
-        Importar JSON
-        <input id="importFile" type="file" accept=".json" class="file-input" />
-      </label>
-      <button id="exportBtn" class="btn btn-ghost">Exportar JSON</button>
-      <button id="restoreBtn" class="btn btn-ghost">Restaurar Padrão</button>
-
-      <div style="flex:1"></div>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <span class="kv">Token:</span>
-        <button id="regenTokenBtn" class="btn btn-ghost">Regenerar</button>
-        <button id="closeAdminBtn" class="btn btn-ghost">Fechar</button>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:16px">
-      <div style="flex:1">
-        <div class="admin-list" id="adminList"></div>
-        <div style="display:flex;justify-content:center;margin-top:12px">
-          <button id="saveAdminBtn" class="btn btn-primary">Salvar alterações</button>
-        </div>
-      </div>
-
-      <div style="width:320px;">
-        <div style="margin-bottom:10px">
-          <strong class="kv">Logs de ações</strong>
-          <div class="log-list" id="logList"></div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="clearLogsBtn" class="btn btn-ghost">Limpar logs</button>
-            <button id="exportLogsBtn" class="btn btn-ghost">Exportar logs</button>
-          </div>
-        </div>
-
-        <div style="margin-top:18px">
-          <strong class="kv">Proteção</strong>
-          <p class="kv" style="margin:6px 0">O painel usa token SHA-256 em <code>sessionStorage</code> enquanto a sessão estiver ativa.</p>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button id="showTokenBtn" class="btn btn-ghost">Mostrar token</button>
-            <button id="revokeTokenBtn" class="btn btn-ghost">Revogar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
 <script>
-/* ----------------------------
-    Config / storage helpers
-    ---------------------------- */
-const ADMIN_PASS = 'staff@22';
-const STORAGE_KEY = 'punicoes';
-const LOGS_KEY = 'punicoes_logs';
+/* --------------------------
+   Reveal Animation Fix
+--------------------------- */
 
-/* PUNIÇÕES PADRÃO (versão definitiva) */
+let revealObserver = null;
+
+function initReveal() {
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add("show");
+      }
+    });
+  }, { threshold: 0.12 });
+
+  observeSections();
+}
+
+function observeSections() {
+  document.querySelectorAll(".section").forEach(sec => {
+    revealObserver.observe(sec);
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  initReveal();
+});
+
+/* ------------------------------
+   STORAGE E SISTEMA ORIGINAL
+------------------------------- */
+
+const STORAGE_KEY = 'punicoes';
+
 const ORIGINAL_DATA = [
   {cat:"Prisão STAFF",inf:"ÁUDIO ESTOURADO NA PRAÇA",pun:"50 meses de prisão"},
   {cat:"Prisão STAFF",inf:"USO INDEVIDO DO CALL ADM",pun:"500 meses de prisão"},
@@ -243,53 +173,36 @@ const ORIGINAL_DATA = [
   {cat:"Banimento Permanente",inf:"DISCRIMINAÇÃO EXTREMA",pun:"Banimento Permanente"}
 ];
 
-/* ensure base exists: if no data saved yet, write original */
 (function ensureBase(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
-    } else {
-      // if corrupted or not array, reset
-      const parsed = JSON.parse(raw);
-      if(!Array.isArray(parsed)) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
-      }
-    }
-  }catch(e){
-    // ERRO: Catch vazio ou erro de sintaxe pode ser problemático.
-    // Melhor logar o erro ou garantir que o localStorage seja resetado se houver falha na leitura.
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
-  }
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
 })();
 
-function loadData(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }catch(e){ return JSON.parse(JSON.stringify(ORIGINAL_DATA)); } }
-function saveData(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-function loadLogs(){ try{ return JSON.parse(localStorage.getItem(LOGS_KEY) || '[]'); }catch(e){ return []; } }
-function pushLog(action, details){ const logs=loadLogs(); logs.unshift({ts:new Date().toISOString(), action, details}); localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); }
+function loadData(){ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
 
-/* ----------------------------
-    Public render & search
-    ---------------------------- */
 const contentArea = document.getElementById('contentArea');
 const searchField = document.getElementById('searchField');
 
-let DATA = loadData();
-
-const revealObserver = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('show'); }); }, {threshold:0.12});
-
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+/* ---------------------------
+    Public Render FIXED
+---------------------------- */
 
 function renderPublic(dataset){
   contentArea.innerHTML = '';
   const cats = [...new Set(dataset.map(x=>x.cat))];
+
   cats.forEach(cat=>{
-    const sec = document.createElement('div'); sec.className='section';
-    const title = document.createElement('div'); title.className='category'; title.textContent=cat;
+    const sec = document.createElement('div');
+    sec.className='section';
+
+    const title = document.createElement('div');
+    title.className='category';
+    title.textContent=cat;
     sec.appendChild(title);
 
-    const table = document.createElement('table'); table.className='table';
-    
+    const table = document.createElement('table');
+    table.className='table';
+
     table.innerHTML = `
       <thead>
         <tr>
@@ -297,288 +210,50 @@ function renderPublic(dataset){
           <th>Punição</th>
         </tr>
       </thead>
-      <tbody>
-        </tbody>
+      <tbody></tbody>
     `;
-    const tbody = table.querySelector('tbody'); 
-    
-    // **INÍCIO DA CORREÇÃO DE INVISIBILIDADE (APLICAÇÃO DE ESTILO INLINE)**
+
+    const tbody = table.querySelector('tbody');
+
     dataset.filter(x=>x.cat===cat).forEach(item=>{
-      const tr = document.createElement('tr'); tr.className='tr-hover';
-      
-      // Cria o elemento <td> para a Infração
+      const tr = document.createElement('tr');
+      tr.className='tr-hover';
+
       const tdInf = document.createElement('td');
-      tdInf.innerHTML = escapeHtml(item.inf);
-      tdInf.style.color = '#fff'; // Força a cor branca inline
-      
-      // Cria o elemento <td> para a Punição
+      tdInf.textContent = item.inf;
+      tdInf.style.color = '#fff';
+
       const tdPun = document.createElement('td');
-      tdPun.innerHTML = escapeHtml(item.pun);
-      tdPun.style.color = '#fff'; // Força a cor branca inline
-      
+      tdPun.textContent = item.pun;
+      tdPun.style.color = '#fff';
+
       tr.appendChild(tdInf);
       tr.appendChild(tdPun);
-      
       tbody.appendChild(tr);
     });
-    // **FIM DA CORREÇÃO**
 
     sec.appendChild(table);
     contentArea.appendChild(sec);
-    revealObserver.observe(sec);
   });
+
+  observeSections();
 }
 
-/* initial render */
-renderPublic(DATA);
+renderPublic(loadData());
 
 /* search */
 searchField.addEventListener('input', e=>{
   const q = (e.target.value||'').trim().toLowerCase();
-  if(!q){ DATA = loadData(); renderPublic(DATA); return; }
+  if(!q){ renderPublic(loadData()); return; }
+
   const filtered = loadData().filter(x=>{
-    return x.inf.toLowerCase().includes(q) || x.pun.toLowerCase().includes(q) || x.cat.toLowerCase().includes(q);
+    return x.inf.toLowerCase().includes(q) ||
+           x.pun.toLowerCase().includes(q) ||
+           x.cat.toLowerCase().includes(q);
   });
+
   renderPublic(filtered);
 });
-
-/* ----------------------------
-    Admin UI & Auth
-    ---------------------------- */
-const openAdminBtn = document.getElementById('openAdminBtn');
-const loginModal = document.getElementById('loginModal');
-const adminModal = document.getElementById('adminModal');
-const adminPassInput = document.getElementById('adminPass');
-const loginBtn = document.getElementById('loginBtn');
-const loginClose = document.getElementById('loginClose');
-
-openAdminBtn.addEventListener('click', ()=>{ adminPassInput.value=''; loginModal.style.display='flex'; loginModal.setAttribute('aria-hidden','false'); setTimeout(()=>adminPassInput.focus(),80); });
-loginClose.addEventListener('click', ()=>{ loginModal.style.display='none'; loginModal.setAttribute('aria-hidden','true'); });
-
-loginBtn.addEventListener('click', async ()=>{
-  const val = adminPassInput.value || '';
-  if(val === ADMIN_PASS){
-    const token = await generateToken(val);
-    sessionStorage.setItem('punicoes_token', token);
-    pushLog('LOGIN','Admin logado');
-    loginModal.style.display='none';
-    openAdminPanel();
-  } else {
-    alert('Senha incorreta');
-    adminPassInput.focus();
-  }
-});
-
-/* close modal if clicked outside */
-document.querySelectorAll('.modal-back').forEach(back=>{
-  back.addEventListener('click', (e)=>{ if(e.target === back){ back.style.display='none'; back.setAttribute('aria-hidden','true'); }});
-});
-
-/* token utils (Web Crypto SHA-256) */
-async function generateToken(password){
-  const nonce = Math.random().toString(36).slice(2,12);
-  const text = password + '::' + nonce + '::' + Date.now();
-  const enc = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest('SHA-256', enc);
-  const hex = Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  return hex;
-}
-function tokenValid(){ return !!sessionStorage.getItem('punicoes_token'); }
-
-/* token UI */
-document.getElementById('regenTokenBtn').addEventListener('click', async ()=>{
-  if(!tokenValid()) return alert('Sem sessão ativa.');
-  const t = await generateToken(ADMIN_PASS);
-  sessionStorage.setItem('punicoes_token', t);
-  pushLog('TOKEN','Token regenerado');
-  alert('Token regenerado.');
-});
-document.getElementById('showTokenBtn').addEventListener('click', ()=>{ alert(sessionStorage.getItem('punicoes_token') || 'Não autenticado.'); });
-document.getElementById('revokeTokenBtn').addEventListener('click', ()=>{ sessionStorage.removeItem('punicoes_token'); pushLog('TOKEN','Token revogado'); alert('Token revogado.'); });
-
-/* ----------------------------
-    Admin Panel Logic (editor / CRUD / import-export / logs)
-    ---------------------------- */
-const adminListEl = document.getElementById('adminList');
-const logListEl = document.getElementById('logList');
-const addNewBtn = document.getElementById('addNewBtn');
-const importFile = document.getElementById('importFile');
-const exportBtn = document.getElementById('exportBtn');
-const restoreBtn = document.getElementById('restoreBtn');
-const saveAdminBtn = document.getElementById('saveAdminBtn');
-const closeAdminBtn = document.getElementById('closeAdminBtn');
-const clearLogsBtn = document.getElementById('clearLogsBtn');
-const exportLogsBtn = document.getElementById('exportLogsBtn');
-
-function openAdminPanel(){
-  if(!tokenValid()){ return alert('Sessão inválida. Faça login novamente.'); }
-  DATA = loadData();
-  renderAdminList();
-  renderLogs();
-  adminModal.style.display='flex'; adminModal.setAttribute('aria-hidden','false');
-  pushLog('OPEN_ADMIN','Painel aberto');
-}
-closeAdminBtn.addEventListener('click', ()=>{ adminModal.style.display='none'; adminModal.setAttribute('aria-hidden','true'); pushLog('CLOSE_ADMIN','Painel fechado'); });
-
-function renderAdminList(){
-  adminListEl.innerHTML = '';
-  DATA.forEach((item, idx) => {
-    const node = document.createElement('div');
-    node.className = 'admin-item';
-    node.innerHTML = `
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <input class="input-inline" data-idx="${idx}" data-field="cat" value="${escapeHtml(item.cat)}" />
-        <input class="input-inline" data-idx="${idx}" data-field="inf" value="${escapeHtml(item.inf)}" style="flex:1" />
-        <input class="input-inline" data-idx="${idx}" data-field="pun" value="${escapeHtml(item.pun)}" style="min-width:220px" />
-      </div>
-      <div class="admin-actions">
-        <button class="btn btn-ghost" data-action="up" data-idx="${idx}">⇧</button>
-        <button class="btn btn-ghost" data-action="down" data-idx="${idx}">⇩</button>
-        <button class="btn btn-ghost" data-action="dup" data-idx="${idx}">Duplicar</button>
-        <button class="btn btn-ghost" data-action="saveone" data-idx="${idx}">Salvar</button>
-        <button class="btn" data-action="del" data-idx="${idx}" style="background:#9b1d1d;color:#fff">Excluir</button>
-      </div>
-    `;
-    adminListEl.appendChild(node);
-  });
-
-  // inputs binding
-  adminListEl.querySelectorAll('input[data-idx]').forEach(inp=>{
-    inp.addEventListener('input', e=>{
-      const i = Number(e.target.dataset.idx);
-      const f = e.target.dataset.field;
-      DATA[i][f] = e.target.value;
-    });
-  });
-
-  // buttons binding
-  adminListEl.querySelectorAll('button[data-action]').forEach(b=>{
-    b.addEventListener('click', e=>{
-      const action = e.currentTarget.dataset.action;
-      const i = Number(e.currentTarget.dataset.idx);
-      if(action==='del'){
-        if(!confirm('Remover esta punição?')) return;
-        const removed = DATA.splice(i,1)[0];
-        pushLog('DELETE', JSON.stringify(removed));
-        renderAdminList();
-      } else if(action==='up' && i>0){
-        const a = DATA.splice(i,1)[0]; DATA.splice(i-1,0,a); renderAdminList();
-      } else if(action==='down' && i < DATA.length-1){
-        const a = DATA.splice(i,1)[0]; DATA.splice(i+1,0,a); renderAdminList();
-      } else if(action==='dup'){
-        const copy = JSON.parse(JSON.stringify(DATA[i])); DATA.splice(i+1,0,copy); pushLog('DUPLICATE',JSON.stringify(copy)); renderAdminList();
-      } else if(action==='saveone'){
-        saveData(DATA);
-        pushLog('SAVE_ONE', `index:${i}`);
-        alert('Salvo!');
-      }
-    });
-  });
-}
-
-/* add new */
-addNewBtn.addEventListener('click', ()=>{
-  const cat = prompt('Categoria (ex: Tickets, Prisão STAFF, Banimento Permanente):','Tickets') || 'Tickets';
-  const inf = prompt('Descrição da infração:','Nova infração') || 'Nova infração';
-  const pun = prompt('Punição aplicada:','Advertência') || 'Advertência';
-  const obj = {cat,inf,pun};
-  DATA.unshift(obj);
-  pushLog('ADD', JSON.stringify(obj));
-  renderAdminList();
-  adminListEl.scrollTop = 0;
-});
-
-/* import */
-importFile.addEventListener('change', (e)=>{
-  const f = e.target.files && e.target.files[0];
-  if(!f) return;
-  const reader = new FileReader();
-  reader.onload = (ev)=>{
-    try{
-      const parsed = JSON.parse(ev.target.result);
-      if(!Array.isArray(parsed)) throw new Error('Arquivo inválido');
-      const option = confirm('Substituir tudo pelas punições do arquivo? (OK = substituir, Cancel = mesclar)');
-      if(option){
-        DATA = parsed;
-        saveData(DATA);
-        pushLog('IMPORT_REPLACE', `count:${parsed.length}`);
-      } else {
-        DATA = parsed.concat(DATA);
-        saveData(DATA);
-        pushLog('IMPORT_MERGE', `imported:${parsed.length}`);
-      }
-      renderAdminList();
-      renderPublic(DATA);
-      alert('Importação concluída.');
-    }catch(err){
-      alert('Erro ao importar JSON: ' + err.message);
-    }
-  };
-  reader.readAsText(f);
-  e.target.value = '';
-});
-
-/* export */
-exportBtn.addEventListener('click', ()=>{
-  const arr = loadData();
-  const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'punicoes_export.json'; a.click(); URL.revokeObjectURL(url);
-  pushLog('EXPORT', `count:${arr.length}`);
-});
-
-/* restore */
-restoreBtn.addEventListener('click', ()=>{
-  if(!confirm('Restaurar padrão? Isso sobrescreverá os dados atuais.')) return;
-  DATA = JSON.parse(JSON.stringify(ORIGINAL_DATA));
-  saveData(DATA);
-  renderAdminList();
-  renderPublic(DATA);
-  pushLog('RESTORE','Restaurado para padrão');
-  alert('Padrão restaurado.');
-});
-
-/* save all */
-saveAdminBtn.addEventListener('click', ()=>{
-  saveData(DATA);
-  renderPublic(DATA);
-  pushLog('SAVE_ALL', `count:${DATA.length}`);
-  alert('Todas alterações salvas no localStorage.');
-});
-
-/* logs UI */
-function renderLogs(){
-  const logs = loadLogs();
-  logListEl.innerHTML = '';
-  logs.forEach(l=>{
-    const div = document.createElement('div'); div.className='log-item';
-    div.innerHTML = `<div style="color:#9f9f9f;font-size:12px">${new Date(l.ts).toLocaleString()}</div><div style="margin-top:4px">${escapeHtml(l.action)} — ${escapeHtml(l.details||'')}</div>`;
-    logListEl.appendChild(div);
-  });
-}
-clearLogsBtn.addEventListener('click', ()=>{
-  if(!confirm('Limpar todos os logs?')) return;
-  localStorage.removeItem(LOGS_KEY);
-  renderLogs();
-  alert('Logs apagados.');
-});
-exportLogsBtn.addEventListener('click', ()=>{
-  const logs = loadLogs();
-  const blob = new Blob([JSON.stringify(logs, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'punicoes_logs.json'; a.click(); URL.revokeObjectURL(url);
-  pushLog('EXPORT_LOGS', `count:${logs.length}`);
-});
-
-/* initial logs render */
-renderLogs();
-
-/* final safety: if storage corrupted, reset */
-try{
-  const check = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-  if(check && !Array.isArray(check)){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
-}catch(e){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
-
 
 </script>
 </body>
