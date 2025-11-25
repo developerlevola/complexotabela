@@ -254,6 +254,243 @@ searchField.addEventListener('input', e=>{
 
   renderPublic(filtered);
 });
+/* ----------------------------
+    Admin UI & Auth
+    ---------------------------- */
+const openAdminBtn = document.getElementById('openAdminBtn');
+const loginModal = document.getElementById('loginModal');
+const adminModal = document.getElementById('adminModal');
+const adminPassInput = document.getElementById('adminPass');
+const loginBtn = document.getElementById('loginBtn');
+const loginClose = document.getElementById('loginClose');
+
+openAdminBtn.addEventListener('click', ()=>{ adminPassInput.value=''; loginModal.style.display='flex'; loginModal.setAttribute('aria-hidden','false'); setTimeout(()=>adminPassInput.focus(),80); });
+loginClose.addEventListener('click', ()=>{ loginModal.style.display='none'; loginModal.setAttribute('aria-hidden','true'); });
+
+loginBtn.addEventListener('click', async ()=>{
+  const val = adminPassInput.value || '';
+  if(val === ADMIN_PASS){
+    const token = await generateToken(val);
+    sessionStorage.setItem('punicoes_token', token);
+    pushLog('LOGIN','Admin logado');
+    loginModal.style.display='none';
+    openAdminPanel();
+  } else {
+    alert('Senha incorreta');
+    adminPassInput.focus();
+  }
+});
+
+/* close modal if clicked outside */
+document.querySelectorAll('.modal-back').forEach(back=>{
+  back.addEventListener('click', (e)=>{ if(e.target === back){ back.style.display='none'; back.setAttribute('aria-hidden','true'); }});
+});
+
+/* token utils (Web Crypto SHA-256) */
+async function generateToken(password){
+  const nonce = Math.random().toString(36).slice(2,12);
+  const text = password + '::' + nonce + '::' + Date.now();
+  const enc = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', enc);
+  const hex = Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  return hex;
+}
+function tokenValid(){ return !!sessionStorage.getItem('punicoes_token'); }
+
+/* token UI */
+document.getElementById('regenTokenBtn').addEventListener('click', async ()=>{
+  if(!tokenValid()) return alert('Sem sessão ativa.');
+  const t = await generateToken(ADMIN_PASS);
+  sessionStorage.setItem('punicoes_token', t);
+  pushLog('TOKEN','Token regenerado');
+  alert('Token regenerado.');
+});
+document.getElementById('showTokenBtn').addEventListener('click', ()=>{ alert(sessionStorage.getItem('punicoes_token') || 'Não autenticado.'); });
+document.getElementById('revokeTokenBtn').addEventListener('click', ()=>{ sessionStorage.removeItem('punicoes_token'); pushLog('TOKEN','Token revogado'); alert('Token revogado.'); });
+
+/* ----------------------------
+    Admin Panel Logic (editor / CRUD / import-export / logs)
+    ---------------------------- */
+const adminListEl = document.getElementById('adminList');
+const logListEl = document.getElementById('logList');
+const addNewBtn = document.getElementById('addNewBtn');
+const importFile = document.getElementById('importFile');
+const exportBtn = document.getElementById('exportBtn');
+const restoreBtn = document.getElementById('restoreBtn');
+const saveAdminBtn = document.getElementById('saveAdminBtn');
+const closeAdminBtn = document.getElementById('closeAdminBtn');
+const clearLogsBtn = document.getElementById('clearLogsBtn');
+const exportLogsBtn = document.getElementById('exportLogsBtn');
+
+function openAdminPanel(){
+  if(!tokenValid()){ return alert('Sessão inválida. Faça login novamente.'); }
+  DATA = loadData();
+  renderAdminList();
+  renderLogs();
+  adminModal.style.display='flex'; adminModal.setAttribute('aria-hidden','false');
+  pushLog('OPEN_ADMIN','Painel aberto');
+}
+closeAdminBtn.addEventListener('click', ()=>{ adminModal.style.display='none'; adminModal.setAttribute('aria-hidden','true'); pushLog('CLOSE_ADMIN','Painel fechado'); });
+
+function renderAdminList(){
+  adminListEl.innerHTML = '';
+  DATA.forEach((item, idx) => {
+    const node = document.createElement('div');
+    node.className = 'admin-item';
+    node.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input class="input-inline" data-idx="${idx}" data-field="cat" value="${escapeHtml(item.cat)}" />
+        <input class="input-inline" data-idx="${idx}" data-field="inf" value="${escapeHtml(item.inf)}" style="flex:1" />
+        <input class="input-inline" data-idx="${idx}" data-field="pun" value="${escapeHtml(item.pun)}" style="min-width:220px" />
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-ghost" data-action="up" data-idx="${idx}">⇧</button>
+        <button class="btn btn-ghost" data-action="down" data-idx="${idx}">⇩</button>
+        <button class="btn btn-ghost" data-action="dup" data-idx="${idx}">Duplicar</button>
+        <button class="btn btn-ghost" data-action="saveone" data-idx="${idx}">Salvar</button>
+        <button class="btn" data-action="del" data-idx="${idx}" style="background:#9b1d1d;color:#fff">Excluir</button>
+      </div>
+    `;
+    adminListEl.appendChild(node);
+  });
+
+  // inputs binding
+  adminListEl.querySelectorAll('input[data-idx]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const i = Number(e.target.dataset.idx);
+      const f = e.target.dataset.field;
+      DATA[i][f] = e.target.value;
+    });
+  });
+
+  // buttons binding
+  adminListEl.querySelectorAll('button[data-action]').forEach(b=>{
+    b.addEventListener('click', e=>{
+      const action = e.currentTarget.dataset.action;
+      const i = Number(e.currentTarget.dataset.idx);
+      if(action==='del'){
+        if(!confirm('Remover esta punição?')) return;
+        const removed = DATA.splice(i,1)[0];
+        pushLog('DELETE', JSON.stringify(removed));
+        renderAdminList();
+      } else if(action==='up' && i>0){
+        const a = DATA.splice(i,1)[0]; DATA.splice(i-1,0,a); renderAdminList();
+      } else if(action==='down' && i < DATA.length-1){
+        const a = DATA.splice(i,1)[0]; DATA.splice(i+1,0,a); renderAdminList();
+      } else if(action==='dup'){
+        const copy = JSON.parse(JSON.stringify(DATA[i])); DATA.splice(i+1,0,copy); pushLog('DUPLICATE',JSON.stringify(copy)); renderAdminList();
+      } else if(action==='saveone'){
+        saveData(DATA);
+        pushLog('SAVE_ONE', `index:${i}`);
+        alert('Salvo!');
+      }
+    });
+  });
+}
+
+/* add new */
+addNewBtn.addEventListener('click', ()=>{
+  const cat = prompt('Categoria (ex: Tickets, Prisão STAFF, Banimento Permanente):','Tickets') || 'Tickets';
+  const inf = prompt('Descrição da infração:','Nova infração') || 'Nova infração';
+  const pun = prompt('Punição aplicada:','Advertência') || 'Advertência';
+  const obj = {cat,inf,pun};
+  DATA.unshift(obj);
+  pushLog('ADD', JSON.stringify(obj));
+  renderAdminList();
+  adminListEl.scrollTop = 0;
+});
+
+/* import */
+importFile.addEventListener('change', (e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const parsed = JSON.parse(ev.target.result);
+      if(!Array.isArray(parsed)) throw new Error('Arquivo inválido');
+      const option = confirm('Substituir tudo pelas punições do arquivo? (OK = substituir, Cancel = mesclar)');
+      if(option){
+        DATA = parsed;
+        saveData(DATA);
+        pushLog('IMPORT_REPLACE', `count:${parsed.length}`);
+      } else {
+        DATA = parsed.concat(DATA);
+        saveData(DATA);
+        pushLog('IMPORT_MERGE', `imported:${parsed.length}`);
+      }
+      renderAdminList();
+      renderPublic(DATA);
+      alert('Importação concluída.');
+    }catch(err){
+      alert('Erro ao importar JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = '';
+});
+
+/* export */
+exportBtn.addEventListener('click', ()=>{
+  const arr = loadData();
+  const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'punicoes_export.json'; a.click(); URL.revokeObjectURL(url);
+  pushLog('EXPORT', `count:${arr.length}`);
+});
+
+/* restore */
+restoreBtn.addEventListener('click', ()=>{
+  if(!confirm('Restaurar padrão? Isso sobrescreverá os dados atuais.')) return;
+  DATA = JSON.parse(JSON.stringify(ORIGINAL_DATA));
+  saveData(DATA);
+  renderAdminList();
+  renderPublic(DATA);
+  pushLog('RESTORE','Restaurado para padrão');
+  alert('Padrão restaurado.');
+});
+
+/* save all */
+saveAdminBtn.addEventListener('click', ()=>{
+  saveData(DATA);
+  renderPublic(DATA);
+  pushLog('SAVE_ALL', `count:${DATA.length}`);
+  alert('Todas alterações salvas no localStorage.');
+});
+
+/* logs UI */
+function renderLogs(){
+  const logs = loadLogs();
+  logListEl.innerHTML = '';
+  logs.forEach(l=>{
+    const div = document.createElement('div'); div.className='log-item';
+    div.innerHTML = `<div style="color:#9f9f9f;font-size:12px">${new Date(l.ts).toLocaleString()}</div><div style="margin-top:4px">${escapeHtml(l.action)} — ${escapeHtml(l.details||'')}</div>`;
+    logListEl.appendChild(div);
+  });
+}
+clearLogsBtn.addEventListener('click', ()=>{
+  if(!confirm('Limpar todos os logs?')) return;
+  localStorage.removeItem(LOGS_KEY);
+  renderLogs();
+  alert('Logs apagados.');
+});
+exportLogsBtn.addEventListener('click', ()=>{
+  const logs = loadLogs();
+  const blob = new Blob([JSON.stringify(logs, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'punicoes_logs.json'; a.click(); URL.revokeObjectURL(url);
+  pushLog('EXPORT_LOGS', `count:${logs.length}`);
+});
+
+/* initial logs render */
+renderLogs();
+
+/* final safety: if storage corrupted, reset */
+try{
+  const check = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+  if(check && !Array.isArray(check)){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
+}catch(e){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
+
 
 </script>
 </body>
