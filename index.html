@@ -24,6 +24,44 @@ body{
     linear-gradient(180deg,#050505 0%, #070707 100%);
   color:#fff;
   -webkit-font-smoothing:antialiased;
+  transition:background .3s ease,color .3s ease;
+}
+
+/* tema claro */
+body.light-theme{
+  background:
+    radial-gradient(800px 200px at 10% 10%, rgba(255,170,1,0.12), transparent),
+    linear-gradient(180deg,#f7f7f9,#e3e3ea);
+  color:#111;
+}
+body.light-theme .search-box{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.06);
+  box-shadow:0 10px 26px rgba(0,0,0,0.12);
+}
+body.light-theme .table{
+  background:linear-gradient(180deg,#ffffff,#f5f5f7);
+  box-shadow:0 10px 26px rgba(0,0,0,0.10);
+}
+body.light-theme .table td{
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  color:#111;
+}
+body.light-theme .tr-hover:hover td{
+  background:rgba(0,0,0,0.03);
+}
+body.light-theme header{
+  border-bottom-color:var(--orange);
+}
+body.light-theme .modal{
+  background:linear-gradient(180deg,#ffffff,#f4f4f6);
+  color:#111;
+}
+body.light-theme .admin-item{
+  background:#f7f7f9;
+}
+body.light-theme .log-list{
+  background:#f3f3f7;
 }
 
 /* header/banner */
@@ -39,11 +77,14 @@ header{
 .brand h1{margin:0;font-size:26px;color:var(--orange);letter-spacing:.4px;text-shadow:0 0 8px rgba(255,170,1,0.08)}
 .brand p{margin:0;font-size:13px;color:#d6d6d6}
 
-/* admin button top-right */
+/* admin + theme button top-right */
 .header-actions{display:flex;gap:10px;align-items:center}
-.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
+.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:13px}
 .btn-primary{background:var(--orange);color:#000;font-weight:800;box-shadow:0 8px 36px rgba(255,170,1,0.12)}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--orange)}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--orange)}
+body.light-theme .btn-ghost{
+  border-color:rgba(0,0,0,0.12);
+}
 
 /* main layout */
 .wrap{max-width:1150px;margin:18px auto;padding:12px 20px}
@@ -59,75 +100,89 @@ header{
 }
 .title{font-size:28px;color:var(--orange);font-weight:800;margin-bottom:8px;text-shadow:0 0 8px rgba(255,170,1,0.06)}
 .lead{color:#d4d4d4;line-height:1.6}
+body.light-theme .lead{color:#444}
 
 /* search */
 .search-wrap{display:flex;justify-content:center;margin:6px 0 18px}
 .search-box{
+  width:100%;max-width:720px;background:#0f0f0f;border-radius:12px;padding:10px 12px;
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:inset 0 6px 18px rgba(0,0,0,0.6);
   position:relative;
-  width:100%;
-  max-width:720px;
-  background:#0f0f0f;
-  border-radius:12px;
-  padding:12px;
-  border:1px solid rgba(255,255,255,0.02);
-  box-shadow:inset 0 6px 18px rgba(0,0,0,0.6)
 }
 .search-box input{
-  width:100%;
-  background:transparent;
-  border:0;
-  color:#fff;
-  padding:6px;
-  font-size:16px;
-  outline:none;
+  width:100%;background:transparent;border:0;color:#fff;
+  padding:6px;font-size:16px;outline:none;
 }
-.search-ghost{
-  margin-top:4px;
-  font-size:12px;
-  color:rgba(255,255,255,0.5);
-  pointer-events:none;
-}
+body.light-theme .search-box input{color:#111}
+
+/* dropdown de sugestões */
 .search-suggest{
   position:absolute;
-  left:0;
-  right:0;
+  left:0;right:0;
   top:100%;
-  margin-top:8px;
-  background:#101010;
+  margin-top:6px;
+  background:#050505;
   border-radius:10px;
   border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 18px 45px rgba(0,0,0,0.75);
   list-style:none;
   padding:6px 0;
   max-height:220px;
   overflow:auto;
-  box-shadow:0 14px 30px rgba(0,0,0,0.7);
+  z-index:9999;
   display:none;
-  z-index:30;
+}
+body.light-theme .search-suggest{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.08);
+  box-shadow:0 18px 45px rgba(0,0,0,0.18);
 }
 .search-suggest li{
-  padding:6px 12px;
-  font-size:14px;
+  padding:8px 12px;
+  font-size:13px;
   color:#f5f5f5;
   cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  transition:background .18s ease, transform .18s ease, opacity .18s ease;
+}
+body.light-theme .search-suggest li{color:#222}
+.search-suggest li span.hint{
+  opacity:.6;
+  font-size:11px;
 }
 .search-suggest li:hover{
-  background:rgba(255,170,1,0.14);
+  background:rgba(255,255,255,0.06);
+  transform:translateY(-1px);
+}
+body.light-theme .search-suggest li:hover{
+  background:rgba(0,0,0,0.04);
 }
 
 /* table */
-.table{margin-top:14px;border-collapse:collapse;width:100%;background:linear-gradient(180deg,#0c0c0c,#070707);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+.table{
+  margin-top:14px;border-collapse:collapse;width:100%;
+  background:linear-gradient(180deg,#0c0c0c,#070707);
+  border-radius:12px;
+  overflow:visible;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+  position:relative;
+}
 .table th{
-  background:var(--orange);
-  color:#000;
-  padding:12px 14px;
-  text-align:left;
-  font-weight:800;
-  cursor:pointer;
-  user-select:none;
+  background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800;
+  cursor:pointer;user-select:none;position:relative;z-index:1;
 }
 .table th span.sort-label{font-weight:800}
 .table th span.sort-indicator{font-size:11px;opacity:.65;margin-left:4px}
-.table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff}
+.table td{
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  color:#fff;
+  position:relative;
+}
 .category{margin-top:26px;font-size:20px;color:var(--orange);font-weight:800;margin-bottom:10px}
 .tr-hover:hover td{background:#0f0f0f}
 
@@ -144,84 +199,64 @@ header{
   to{opacity:1; transform:translateY(0);}
 }
 
-/* badges + tooltips */
+/* badge + tooltip */
 .badge{
   display:inline-flex;
   align-items:center;
-  padding:2px 7px;
+  justify-content:center;
+  min-width:20px;
+  height:20px;
   border-radius:999px;
   font-size:11px;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:.6px;
-  margin:0 2px;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.16);
-}
-.badge-rdm{
-  color:#ff6b6b;
-  background:rgba(255,107,107,0.12);
-  border-color:rgba(255,107,107,0.7);
-}
-.badge-vdm{
-  color:#ffa94d;
-  background:rgba(255,169,77,0.12);
-  border-color:rgba(255,169,77,0.7);
-}
-.badge-meta{
-  color:#845ef7;
-  background:rgba(132,94,247,0.12);
-  border-color:rgba(132,94,247,0.7);
-}
-.badge-pg{
-  color:#4dabf7;
-  background:rgba(77,171,247,0.12);
-  border-color:rgba(77,171,247,0.7);
-}
-.badge-anti{
-  color:#ff922b;
-  background:rgba(255,146,43,0.12);
-  border-color:rgba(255,146,43,0.7);
-}
-.badge-dark{
-  color:#e64980;
-  background:rgba(230,73,128,0.12);
-  border-color:rgba(230,73,128,0.7);
-}
-.badge-cheat{
-  color:#ff4d4f;
-  background:rgba(255,77,79,0.12);
-  border-color:rgba(255,77,79,0.7);
-}
-
-.badge[data-tooltip]{
+  margin-right:6px;
+  padding:0 6px;
+  background:rgba(255,255,255,0.08);
+  box-shadow:0 0 12px rgba(0,0,0,0.7);
   position:relative;
-  cursor:help;
 }
+.badge-ban{background:rgba(255,0,0,0.15);}
+.badge-prisao{background:rgba(0,140,255,0.15);}
+.badge-adv{background:rgba(255,215,0,0.15);}
+.badge-adv-verbal{background:rgba(186,85,211,0.18);}
+
+/* tooltip simples */
 .badge[data-tooltip]::after{
   content:attr(data-tooltip);
   position:absolute;
-  left:50%;
   bottom:130%;
-  transform:translate(-50%,4px);
+  left:50%;
+  transform:translateX(-50%);
   background:#000;
   color:#fff;
-  padding:6px 8px;
-  border-radius:6px;
   font-size:11px;
-  line-height:1.4;
+  padding:4px 8px;
+  border-radius:6px;
+  white-space:nowrap;
   opacity:0;
   pointer-events:none;
-  white-space:normal;
-  min-width:160px;
-  max-width:240px;
-  box-shadow:0 10px 24px rgba(0,0,0,0.7);
-  transition:opacity .16s ease, transform .16s ease;
-  z-index:40;
+  transition:opacity .18s ease, transform .18s ease;
+  z-index:99999;
+  box-shadow:0 10px 26px rgba(0,0,0,0.7);
 }
-.badge[data-tooltip]:hover::after{
+.badge[data-tooltip]::before{
+  content:"";
+  position:absolute;
+  bottom:120%;
+  left:50%;
+  transform:translateX(-50%);
+  border-width:6px;
+  border-style:solid;
+  border-color:#000 transparent transparent transparent;
+  opacity:0;
+  transition:opacity .18s ease;
+  z-index:99998;
+}
+.badge:hover::after,
+.badge:hover::before{
   opacity:1;
-  transform:translate(-50%,0);
+}
+.badge:hover::after{
+  transform:translate(-50%,-2px);
 }
 
 /* modal / admin */
@@ -253,78 +288,6 @@ header{
 @keyframes slideFade{
   from{opacity:0; transform:translateY(18px);}
   to{opacity:1; transform:translateY(0);}
-}
-
-/* LIGHT THEME */
-body.light{
-  background:
-    radial-gradient(800px 200px at 10% 10%, rgba(255,170,1,0.06), transparent),
-    linear-gradient(180deg,#f5f5f5,#e3e3e3);
-  color:#111;
-}
-body.light header{
-  border-bottom-color:#e09000;
-}
-body.light .search-box{
-  background:#ffffff;
-  border-color:rgba(0,0,0,0.08);
-  box-shadow:0 4px 16px rgba(0,0,0,0.12);
-}
-body.light .search-box input{
-  color:#111;
-}
-body.light .search-ghost{
-  color:rgba(0,0,0,0.55);
-}
-body.light .search-suggest{
-  background:#ffffff;
-  border-color:rgba(0,0,0,0.08);
-  box-shadow:0 10px 26px rgba(0,0,0,0.14);
-}
-body.light .search-suggest li{
-  color:#222;
-}
-body.light .search-suggest li:hover{
-  background:rgba(255,170,1,0.16);
-}
-body.light .table{
-  background:linear-gradient(180deg,#ffffff,#f6f6f6);
-  box-shadow:0 10px 24px rgba(0,0,0,0.18);
-}
-body.light .table th{
-  background:#111;
-  color:#fff;
-}
-body.light .table td{
-  color:#111;
-  border-bottom-color:rgba(0,0,0,0.06);
-}
-body.light .tr-hover:hover td{
-  background:#f1f1f1;
-}
-body.light .modal{
-  background:linear-gradient(180deg,#ffffff,#f3f3f3);
-  color:#222;
-}
-body.light .admin-item{
-  background:#f7f7f7;
-  border-color:rgba(0,0,0,0.04);
-}
-body.light .log-list{
-  background:#f5f5f5;
-  border-color:rgba(0,0,0,0.04);
-}
-body.light .input-inline{
-  background:#ffffff;
-  border-color:rgba(0,0,0,0.08);
-  color:#222;
-}
-body.light .btn-ghost{
-  color:#b96b00;
-  border-color:rgba(0,0,0,0.1);
-}
-body.light .badge[data-tooltip]::after{
-  background:#111;
 }
 
 /* responsive */
@@ -363,8 +326,7 @@ body.light .badge[data-tooltip]::after{
 
   <section class="section search-wrap">
     <div class="search-box">
-      <input id="searchField" placeholder="Pesquisar infração, punição ou categoria (ex.: RDM, Banimento)..." />
-      <div id="searchGhost" class="search-ghost"></div>
+      <input id="searchField" placeholder="Pesquisar infração, punição ou categoria (ex.: RDM, Banimento)..." autocomplete="off" />
       <ul id="searchSuggest" class="search-suggest"></ul>
     </div>
   </section>
@@ -469,7 +431,7 @@ const ORIGINAL_DATA = [
   {cat:"Tickets",inf:"MAL USO DO CHAT",pun:"50 meses ou Advertência Verbal"},
   {cat:"Tickets",inf:"REGRAS DE SAFE ZONE",pun:"Advertência Verbal + 100 meses"},
   {cat:"Tickets",inf:"ANTI AMOR À VIDA",pun:"Advertência Verbal"},
-  {cat:"Tickets",inf:"ABUSO DE BUG",pun:"Advertência Verbal + 300 meses"},
+  {cat:"Tickets",inf:"ABUSO DE BUG",pun:"Advertência Verbal + 300 months"},
   {cat:"Tickets",inf:"BIND EM AÇÃO",pun:"Advertência 1 + 1000 meses"},
   {cat:"Tickets",inf:"FAKE EMPREGO",pun:"100 meses ou Advertência Verbal"},
   {cat:"Tickets",inf:"FORÇAR AÇÃO",pun:"Advertência Verbal + 1000 meses"},
@@ -511,25 +473,36 @@ function loadLogs(){ try{ return JSON.parse(localStorage.getItem(LOGS_KEY) || '[
 function pushLog(action, details){ const logs=loadLogs(); logs.unshift({ts:new Date().toISOString(), action, details}); localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); }
 
 /* ----------------------------
+    Tema claro/escuro
+    ---------------------------- */
+const themeToggle = document.getElementById('themeToggle');
+function applyTheme(theme){
+  if(theme === 'light'){
+    document.body.classList.add('light-theme');
+    themeToggle.textContent = '🌙';
+  }else{
+    document.body.classList.remove('light-theme');
+    themeToggle.textContent = '☀️';
+  }
+}
+const savedTheme = localStorage.getItem('punicoes_theme') || 'dark';
+applyTheme(savedTheme);
+
+themeToggle.addEventListener('click', ()=>{
+  const current = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  localStorage.setItem('punicoes_theme', next);
+  applyTheme(next);
+});
+
+/* ----------------------------
     Public render & search
     ---------------------------- */
 const contentArea = document.getElementById('contentArea');
 const searchField = document.getElementById('searchField');
-const searchGhost = document.getElementById('searchGhost');
 const searchSuggest = document.getElementById('searchSuggest');
 
 let DATA = loadData();
-
-/* sugestões para auto-complete */
-const SUGGESTIONS = (() => {
-  const set = new Set();
-  loadData().forEach(x=>{
-    if(x.cat) set.add(x.cat);
-    if(x.inf) set.add(x.inf);
-    if(x.pun) set.add(x.pun);
-  });
-  return Array.from(set);
-})();
 
 /* observer das sections */
 const revealObserver = new IntersectionObserver((entries)=>{
@@ -546,47 +519,40 @@ function observeSections(){
 
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-/* badges + tooltip em palavras-chave */
-function highlightKeywords(html){
-  const rules = [
-    {regex:/\bRDM\b/g, className:'badge-rdm', tip:'RDM — matar sem motivo ou contexto de roleplay.'},
-    {regex:/\bVDM\b/g, className:'badge-vdm', tip:'VDM — usar veículo como arma fora de contexto de roleplay.'},
-    {regex:/\bMETA GAMING\b/gi, className:'badge-meta', tip:'Meta Gaming — usar informações de fora do jogo dentro do RP.'},
-    {regex:/\bPOWER GAMING\b/gi, className:'badge-pg', tip:'Power Gaming — abusar de mecânicas ou forçar situações irreais.'},
-    {regex:/\bANTI[- ]?RP\b/gi, className:'badge-anti', tip:'Anti-RP — atitudes totalmente contra a imersão e o roleplay.'},
-    {regex:/\bDARK[- ]?RP\b/gi, className:'badge-dark', tip:'Dark RP — conteúdo pesado/inadequado dentro do RP.'},
-    {regex:/\bCHEATS?\b/gi, className:'badge-cheat', tip:'Cheats — uso de programas externos para obter vantagem.'},
-    {regex:/\bSPOOFERS?\b/gi, className:'badge-cheat', tip:'Spoofers — burlar punições alterando identificadores.'}
-  ];
-  let out = html;
-  rules.forEach(rule=>{
-    out = out.replace(rule.regex, match =>
-      `<span class="badge ${rule.className}" data-tooltip="${rule.tip}">${match}</span>`
-    );
-  });
-  return out;
-}
-
-/* Badge com emoji antes do texto da punição */
+/* Badge com emoji e tooltip */
 function formatPunicaoWithBadge(pun){
   const lower = pun.toLowerCase();
   let emoji = '';
+  let tooltip = '';
+  let badgeClass = '';
 
   if(lower.includes('banimento')){
-    emoji = '🔴 ';
+    emoji = '🔴';
+    tooltip = 'Banimento';
+    badgeClass = 'badge-ban';
   }else if(lower.includes('prisão')){
-    emoji = '🔵 ';
+    emoji = '🔵';
+    tooltip = 'Prisão';
+    badgeClass = 'badge-prisao';
   }else if(lower.includes('advertência verbal')){
-    emoji = '🟣 ';
+    emoji = '🟣';
+    tooltip = 'Advertência verbal';
+    badgeClass = 'badge-adv-verbal';
   }else if(lower.includes('advertência')){
-    emoji = '🟡 ';
+    emoji = '🟡';
+    tooltip = 'Advertência';
+    badgeClass = 'badge-adv';
   }
 
-  const baseHtml = escapeHtml(pun);
-  const highlighted = highlightKeywords(baseHtml);
-  return emoji + highlighted;
+  if(!emoji){
+    return '<span class="pun-text">' + escapeHtml(pun) + '</span>';
+  }
+
+  return '<span class="badge ' + badgeClass + '" data-tooltip="' + tooltip + '">' + emoji + '</span>' +
+         '<span class="pun-text">' + escapeHtml(pun) + '</span>';
 }
 
+/* render público */
 function renderPublic(dataset){
   // animação ao pesquisar / recriar tabelas
   contentArea.classList.remove('animate-search');
@@ -596,7 +562,7 @@ function renderPublic(dataset){
   contentArea.innerHTML = '';
   const cats = [...new Set(dataset.map(x=>x.cat))];
 
-  let rowIndex = 0; // para delay em cascata
+  let rowIndex = 0; // para delay em cascata geral
 
   cats.forEach(cat=>{
     const sec = document.createElement('div');
@@ -637,7 +603,7 @@ function renderPublic(dataset){
         rowIndex++;
 
         const tdInf = document.createElement('td');
-        tdInf.innerHTML = highlightKeywords(escapeHtml(item.inf));
+        tdInf.innerHTML = escapeHtml(item.inf);
         tdInf.style.color = '#fff';
 
         const tdPun = document.createElement('td');
@@ -660,34 +626,53 @@ function renderPublic(dataset){
 renderPublic(DATA);
 observeSections();
 
-/* Auto-complete helpers */
-function getSuggestions(query){
-  const q = (query || '').trim().toLowerCase();
-  if(!q) return [];
-  return SUGGESTIONS
-    .filter(item => (item || '').toLowerCase().includes(q))
-    .slice(0,8);
-}
-
-function updateSuggestionsUI(list, query){
-  if(!query || !list.length){
-    searchGhost.textContent = '';
+/* sugestões de busca (dropdown) */
+function updateSuggestions(q){
+  searchSuggest.innerHTML = '';
+  if(!q){
     searchSuggest.style.display = 'none';
-    searchSuggest.innerHTML = '';
     return;
   }
-  searchGhost.textContent = 'Sugestão: ' + list[0];
-  searchSuggest.innerHTML = list.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+  const lower = q.toLowerCase();
+  const seen = new Set();
+  const list = [];
+
+  loadData().forEach(x=>{
+    [x.inf,x.pun,x.cat].forEach(src=>{
+      const txt = String(src || '');
+      const low = txt.toLowerCase();
+      if(low.includes(lower) && !seen.has(low)){
+        seen.add(low);
+        list.push(txt);
+      }
+    });
+  });
+
+  const top = list.slice(0,8);
+  if(top.length === 0){
+    searchSuggest.style.display = 'none';
+    return;
+  }
+
+  top.forEach(item=>{
+    const li = document.createElement('li');
+    li.innerHTML = '<span>' + escapeHtml(item) + '</span><span class="hint">enter para aplicar</span>';
+    li.addEventListener('mousedown', ()=>{
+      searchField.value = item;
+      searchField.dispatchEvent(new Event('input'));
+      searchSuggest.style.display = 'none';
+    });
+    searchSuggest.appendChild(li);
+  });
+
   searchSuggest.style.display = 'block';
 }
 
-/* busca com múltiplos termos + auto-complete */
+/* busca com múltiplos termos (ex: "rdm prisão") */
 searchField.addEventListener('input', e=>{
-  const raw = (e.target.value||'');
-  const q = raw.trim().toLowerCase();
+  const q = (e.target.value||'').trim().toLowerCase();
 
-  const suggestions = getSuggestions(raw);
-  updateSuggestionsUI(suggestions, raw);
+  updateSuggestions(q);
 
   if(!q){
     DATA = loadData();
@@ -705,23 +690,15 @@ searchField.addEventListener('input', e=>{
   renderPublic(filtered);
 });
 
-/* clique na sugestão */
-searchSuggest.addEventListener('click', e=>{
-  const li = e.target.closest('li');
-  if(!li) return;
-  const value = li.textContent;
-  searchField.value = value;
-  searchSuggest.style.display = 'none';
-  searchGhost.textContent = '';
-  const ev = new Event('input');
-  searchField.dispatchEvent(ev);
-});
-
-/* fecha sugestões ao clicar fora */
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.search-box')){
+/* fechar dropdown ao clicar fora ou apertar Esc */
+document.addEventListener('click', (e)=>{
+  if(!searchSuggest.contains(e.target) && e.target !== searchField){
     searchSuggest.style.display = 'none';
-    searchGhost.textContent = '';
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    searchSuggest.style.display = 'none';
   }
 });
 
@@ -756,35 +733,6 @@ contentArea.addEventListener('click', (e)=>{
     row.style.animationDelay = (idx * 0.03) + 's';
     tbody.appendChild(row);
   });
-});
-
-/* ----------------------------
-    Theme toggle (claro/escuro)
-    ---------------------------- */
-const themeToggleBtn = document.getElementById('themeToggle');
-
-function setTheme(theme){
-  if(theme === 'light'){
-    document.body.classList.add('light');
-    themeToggleBtn.textContent = '🌙';
-    themeToggleBtn.title = 'Alternar para modo escuro';
-  }else{
-    document.body.classList.remove('light');
-    themeToggleBtn.textContent = '☀️';
-    themeToggleBtn.title = 'Alternar para modo claro';
-  }
-  localStorage.setItem('punicoes_theme', theme);
-}
-
-(function initTheme(){
-  const saved = localStorage.getItem('punicoes_theme');
-  const theme = saved === 'light' ? 'light' : 'dark';
-  setTheme(theme);
-})();
-
-themeToggleBtn.addEventListener('click', ()=>{
-  const isLight = document.body.classList.contains('light');
-  setTheme(isLight ? 'dark' : 'light');
 });
 
 /* ----------------------------
