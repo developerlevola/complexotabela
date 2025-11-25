@@ -51,6 +51,21 @@ header{
 .title{font-size:28px;color:var(--orange);font-weight:800;margin-bottom:8px;text-shadow:0 0 8px rgba(255,170,1,0.06)}
 .lead{color:#d4d4d4;line-height:1.6}
 
+ /* 🔧 CORREÇÃO DA TELA PRETA */
+.section{
+  margin-bottom:36px;
+  opacity:1;                 /* Antes era 0 (sumia tudo) */
+  transform:translateY(0);   /* Antes ficava fora da tela se o observer falhava */
+  transition:0.7s cubic-bezier(.2,.9,.3,1)
+}
+.section.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.title{font-size:28px;color:var(--orange);font-weight:800;margin-bottom:8px;text-shadow:0 0 8px rgba(255,170,1,0.06)}
+.lead{color:#d4d4d4;line-height:1.6}
+
 /* search */
 .search-wrap{display:flex;justify-content:center;margin:6px 0 18px}
 .search-box{width:100%;max-width:720px;background:#0f0f0f;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.02);box-shadow:inset 0 6px 18px rgba(0,0,0,0.6)}
