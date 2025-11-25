@@ -46,23 +46,16 @@ header{
 
 /* main layout */
 .wrap{max-width:1150px;margin:18px auto;padding:12px 20px}
-.section{margin-bottom:36px;opacity:0;transform:translateY(28px);transition:0.7s cubic-bezier(.2,.9,.3,1)}
-.section.show{opacity:1;transform:translateY(0)}
-.title{font-size:28px;color:var(--orange);font-weight:800;margin-bottom:8px;text-shadow:0 0 8px rgba(255,170,1,0.06)}
-.lead{color:#d4d4d4;line-height:1.6}
-
- /* 🔧 CORREÇÃO DA TELA PRETA */
 .section{
   margin-bottom:36px;
-  opacity:1;                 /* Antes era 0 (sumia tudo) */
-  transform:translateY(0);   /* Antes ficava fora da tela se o observer falhava */
-  transition:0.7s cubic-bezier(.2,.9,.3,1)
+  opacity:0;
+  transform:translateY(28px);
+  transition:0.7s cubic-bezier(.2,.9,.3,1);
 }
 .section.show{
   opacity:1;
   transform:translateY(0);
 }
-
 .title{font-size:28px;color:var(--orange);font-weight:800;margin-bottom:8px;text-shadow:0 0 8px rgba(255,170,1,0.06)}
 .lead{color:#d4d4d4;line-height:1.6}
 
@@ -74,7 +67,7 @@ header{
 /* table */
 .table{margin-top:14px;border-collapse:collapse;width:100%;background:linear-gradient(180deg,#0c0c0c,#070707);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
 .table th{background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800}
-.table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff} /* <-- A cor padrão continua aqui, mas o JS irá reforçar */
+.table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff}
 .category{margin-top:26px;font-size:20px;color:var(--orange);font-weight:800;margin-bottom:10px}
 .tr-hover:hover td{background:#0f0f0f}
 
@@ -99,6 +92,15 @@ header{
 /* little helpers */
 .kv{font-size:13px;color:#bfbfbf}
 .btn-small{padding:6px 8px;border-radius:8px;border:0}
+
+/* animação slide+fade ao recriar conteúdo (busca) */
+.animate-search{
+  animation:slideFade .45s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes slideFade{
+  from{opacity:0; transform:translateY(18px);}
+  to{opacity:1; transform:translateY(0);}
+}
 
 /* responsive */
 @media (max-width:720px){
@@ -265,15 +267,12 @@ const ORIGINAL_DATA = [
     if(!raw){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
     } else {
-      // if corrupted or not array, reset
       const parsed = JSON.parse(raw);
       if(!Array.isArray(parsed)) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
       }
     }
   }catch(e){
-    // ERRO: Catch vazio ou erro de sintaxe pode ser problemático.
-    // Melhor logar o erro ou garantir que o localStorage seja resetado se houver falha na leitura.
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ORIGINAL_DATA));
   }
 })();
@@ -291,11 +290,26 @@ const searchField = document.getElementById('searchField');
 
 let DATA = loadData();
 
-const revealObserver = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('show'); }); }, {threshold:0.12});
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.classList.add('show');
+    }
+  });
+},{threshold:0.12});
+
+function observeSections(){
+  document.querySelectorAll('.section').forEach(sec=>revealObserver.observe(sec));
+}
 
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function renderPublic(dataset){
+  // animação ao pesquisar / recriar tabelas
+  contentArea.classList.remove('animate-search');
+  void contentArea.offsetWidth;
+  contentArea.classList.add('animate-search');
+
   contentArea.innerHTML = '';
   const cats = [...new Set(dataset.map(x=>x.cat))];
   cats.forEach(cat=>{
@@ -312,40 +326,33 @@ function renderPublic(dataset){
           <th>Punição</th>
         </tr>
       </thead>
-      <tbody>
-        </tbody>
+      <tbody></tbody>
     `;
     const tbody = table.querySelector('tbody'); 
     
-    // **INÍCIO DA CORREÇÃO DE INVISIBILIDADE (APLICAÇÃO DE ESTILO INLINE)**
     dataset.filter(x=>x.cat===cat).forEach(item=>{
       const tr = document.createElement('tr'); tr.className='tr-hover';
-      
-      // Cria o elemento <td> para a Infração
       const tdInf = document.createElement('td');
       tdInf.innerHTML = escapeHtml(item.inf);
-      tdInf.style.color = '#fff'; // Força a cor branca inline
-      
-      // Cria o elemento <td> para a Punição
+      tdInf.style.color = '#fff';
       const tdPun = document.createElement('td');
       tdPun.innerHTML = escapeHtml(item.pun);
-      tdPun.style.color = '#fff'; // Força a cor branca inline
-      
+      tdPun.style.color = '#fff';
       tr.appendChild(tdInf);
       tr.appendChild(tdPun);
-      
       tbody.appendChild(tr);
     });
-    // **FIM DA CORREÇÃO**
 
     sec.appendChild(table);
     contentArea.appendChild(sec);
-    revealObserver.observe(sec);
   });
+
+  observeSections();
 }
 
 /* initial render */
 renderPublic(DATA);
+observeSections();
 
 /* search */
 searchField.addEventListener('input', e=>{
@@ -593,7 +600,6 @@ try{
   const check = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
   if(check && !Array.isArray(check)){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
 }catch(e){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
-
 
 </script>
 </body>
