@@ -62,12 +62,69 @@ header{
 
 /* search */
 .search-wrap{display:flex;justify-content:center;margin:6px 0 18px}
-.search-box{width:100%;max-width:720px;background:#0f0f0f;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.02);box-shadow:inset 0 6px 18px rgba(0,0,0,0.6)}
-.search-box input{width:100%;background:transparent;border:0;color:#fff;padding:6px;font-size:16px;outline:none}
+.search-box{
+  position:relative;
+  width:100%;
+  max-width:720px;
+  background:#0f0f0f;
+  border-radius:12px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,0.02);
+  box-shadow:inset 0 6px 18px rgba(0,0,0,0.6)
+}
+.search-box input{
+  width:100%;
+  background:transparent;
+  border:0;
+  color:#fff;
+  padding:6px;
+  font-size:16px;
+  outline:none;
+}
+.search-ghost{
+  margin-top:4px;
+  font-size:12px;
+  color:rgba(255,255,255,0.5);
+  pointer-events:none;
+}
+.search-suggest{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  margin-top:8px;
+  background:#101010;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.08);
+  list-style:none;
+  padding:6px 0;
+  max-height:220px;
+  overflow:auto;
+  box-shadow:0 14px 30px rgba(0,0,0,0.7);
+  display:none;
+  z-index:30;
+}
+.search-suggest li{
+  padding:6px 12px;
+  font-size:14px;
+  color:#f5f5f5;
+  cursor:pointer;
+}
+.search-suggest li:hover{
+  background:rgba(255,170,1,0.14);
+}
 
 /* table */
 .table{margin-top:14px;border-collapse:collapse;width:100%;background:linear-gradient(180deg,#0c0c0c,#070707);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.table th{background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800;cursor:pointer;user-select:none}
+.table th{
+  background:var(--orange);
+  color:#000;
+  padding:12px 14px;
+  text-align:left;
+  font-weight:800;
+  cursor:pointer;
+  user-select:none;
+}
 .table th span.sort-label{font-weight:800}
 .table th span.sort-indicator{font-size:11px;opacity:.65;margin-left:4px}
 .table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff}
@@ -85,6 +142,86 @@ header{
 @keyframes rowFade{
   from{opacity:0; transform:translateY(10px);}
   to{opacity:1; transform:translateY(0);}
+}
+
+/* badges + tooltips */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:2px 7px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  margin:0 2px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.16);
+}
+.badge-rdm{
+  color:#ff6b6b;
+  background:rgba(255,107,107,0.12);
+  border-color:rgba(255,107,107,0.7);
+}
+.badge-vdm{
+  color:#ffa94d;
+  background:rgba(255,169,77,0.12);
+  border-color:rgba(255,169,77,0.7);
+}
+.badge-meta{
+  color:#845ef7;
+  background:rgba(132,94,247,0.12);
+  border-color:rgba(132,94,247,0.7);
+}
+.badge-pg{
+  color:#4dabf7;
+  background:rgba(77,171,247,0.12);
+  border-color:rgba(77,171,247,0.7);
+}
+.badge-anti{
+  color:#ff922b;
+  background:rgba(255,146,43,0.12);
+  border-color:rgba(255,146,43,0.7);
+}
+.badge-dark{
+  color:#e64980;
+  background:rgba(230,73,128,0.12);
+  border-color:rgba(230,73,128,0.7);
+}
+.badge-cheat{
+  color:#ff4d4f;
+  background:rgba(255,77,79,0.12);
+  border-color:rgba(255,77,79,0.7);
+}
+
+.badge[data-tooltip]{
+  position:relative;
+  cursor:help;
+}
+.badge[data-tooltip]::after{
+  content:attr(data-tooltip);
+  position:absolute;
+  left:50%;
+  bottom:130%;
+  transform:translate(-50%,4px);
+  background:#000;
+  color:#fff;
+  padding:6px 8px;
+  border-radius:6px;
+  font-size:11px;
+  line-height:1.4;
+  opacity:0;
+  pointer-events:none;
+  white-space:normal;
+  min-width:160px;
+  max-width:240px;
+  box-shadow:0 10px 24px rgba(0,0,0,0.7);
+  transition:opacity .16s ease, transform .16s ease;
+  z-index:40;
+}
+.badge[data-tooltip]:hover::after{
+  opacity:1;
+  transform:translate(-50%,0);
 }
 
 /* modal / admin */
@@ -118,6 +255,78 @@ header{
   to{opacity:1; transform:translateY(0);}
 }
 
+/* LIGHT THEME */
+body.light{
+  background:
+    radial-gradient(800px 200px at 10% 10%, rgba(255,170,1,0.06), transparent),
+    linear-gradient(180deg,#f5f5f5,#e3e3e3);
+  color:#111;
+}
+body.light header{
+  border-bottom-color:#e09000;
+}
+body.light .search-box{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.08);
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+}
+body.light .search-box input{
+  color:#111;
+}
+body.light .search-ghost{
+  color:rgba(0,0,0,0.55);
+}
+body.light .search-suggest{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.08);
+  box-shadow:0 10px 26px rgba(0,0,0,0.14);
+}
+body.light .search-suggest li{
+  color:#222;
+}
+body.light .search-suggest li:hover{
+  background:rgba(255,170,1,0.16);
+}
+body.light .table{
+  background:linear-gradient(180deg,#ffffff,#f6f6f6);
+  box-shadow:0 10px 24px rgba(0,0,0,0.18);
+}
+body.light .table th{
+  background:#111;
+  color:#fff;
+}
+body.light .table td{
+  color:#111;
+  border-bottom-color:rgba(0,0,0,0.06);
+}
+body.light .tr-hover:hover td{
+  background:#f1f1f1;
+}
+body.light .modal{
+  background:linear-gradient(180deg,#ffffff,#f3f3f3);
+  color:#222;
+}
+body.light .admin-item{
+  background:#f7f7f7;
+  border-color:rgba(0,0,0,0.04);
+}
+body.light .log-list{
+  background:#f5f5f5;
+  border-color:rgba(0,0,0,0.04);
+}
+body.light .input-inline{
+  background:#ffffff;
+  border-color:rgba(0,0,0,0.08);
+  color:#222;
+}
+body.light .btn-ghost{
+  color:#b96b00;
+  border-color:rgba(0,0,0,0.1);
+}
+body.light .badge[data-tooltip]::after{
+  background:#111;
+}
+
 /* responsive */
 @media (max-width:720px){
   header{height:200px}
@@ -140,6 +349,7 @@ header{
     </div>
 
     <div class="header-actions">
+      <button id="themeToggle" class="btn btn-ghost" title="Alternar tema">☀️</button>
       <button id="openAdminBtn" class="btn btn-primary" title="Painel Admin">Painel Admin</button>
     </div>
   </div>
@@ -154,6 +364,8 @@ header{
   <section class="section search-wrap">
     <div class="search-box">
       <input id="searchField" placeholder="Pesquisar infração, punição ou categoria (ex.: RDM, Banimento)..." />
+      <div id="searchGhost" class="search-ghost"></div>
+      <ul id="searchSuggest" class="search-suggest"></ul>
     </div>
   </section>
 
@@ -303,8 +515,21 @@ function pushLog(action, details){ const logs=loadLogs(); logs.unshift({ts:new D
     ---------------------------- */
 const contentArea = document.getElementById('contentArea');
 const searchField = document.getElementById('searchField');
+const searchGhost = document.getElementById('searchGhost');
+const searchSuggest = document.getElementById('searchSuggest');
 
 let DATA = loadData();
+
+/* sugestões para auto-complete */
+const SUGGESTIONS = (() => {
+  const set = new Set();
+  loadData().forEach(x=>{
+    if(x.cat) set.add(x.cat);
+    if(x.inf) set.add(x.inf);
+    if(x.pun) set.add(x.pun);
+  });
+  return Array.from(set);
+})();
 
 /* observer das sections */
 const revealObserver = new IntersectionObserver((entries)=>{
@@ -321,6 +546,27 @@ function observeSections(){
 
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+/* badges + tooltip em palavras-chave */
+function highlightKeywords(html){
+  const rules = [
+    {regex:/\bRDM\b/g, className:'badge-rdm', tip:'RDM — matar sem motivo ou contexto de roleplay.'},
+    {regex:/\bVDM\b/g, className:'badge-vdm', tip:'VDM — usar veículo como arma fora de contexto de roleplay.'},
+    {regex:/\bMETA GAMING\b/gi, className:'badge-meta', tip:'Meta Gaming — usar informações de fora do jogo dentro do RP.'},
+    {regex:/\bPOWER GAMING\b/gi, className:'badge-pg', tip:'Power Gaming — abusar de mecânicas ou forçar situações irreais.'},
+    {regex:/\bANTI[- ]?RP\b/gi, className:'badge-anti', tip:'Anti-RP — atitudes totalmente contra a imersão e o roleplay.'},
+    {regex:/\bDARK[- ]?RP\b/gi, className:'badge-dark', tip:'Dark RP — conteúdo pesado/inadequado dentro do RP.'},
+    {regex:/\bCHEATS?\b/gi, className:'badge-cheat', tip:'Cheats — uso de programas externos para obter vantagem.'},
+    {regex:/\bSPOOFERS?\b/gi, className:'badge-cheat', tip:'Spoofers — burlar punições alterando identificadores.'}
+  ];
+  let out = html;
+  rules.forEach(rule=>{
+    out = out.replace(rule.regex, match =>
+      `<span class="badge ${rule.className}" data-tooltip="${rule.tip}">${match}</span>`
+    );
+  });
+  return out;
+}
+
 /* Badge com emoji antes do texto da punição */
 function formatPunicaoWithBadge(pun){
   const lower = pun.toLowerCase();
@@ -336,7 +582,9 @@ function formatPunicaoWithBadge(pun){
     emoji = '🟡 ';
   }
 
-  return emoji + escapeHtml(pun);
+  const baseHtml = escapeHtml(pun);
+  const highlighted = highlightKeywords(baseHtml);
+  return emoji + highlighted;
 }
 
 function renderPublic(dataset){
@@ -389,7 +637,7 @@ function renderPublic(dataset){
         rowIndex++;
 
         const tdInf = document.createElement('td');
-        tdInf.innerHTML = escapeHtml(item.inf);
+        tdInf.innerHTML = highlightKeywords(escapeHtml(item.inf));
         tdInf.style.color = '#fff';
 
         const tdPun = document.createElement('td');
@@ -412,9 +660,35 @@ function renderPublic(dataset){
 renderPublic(DATA);
 observeSections();
 
-/* busca com múltiplos termos (ex: "rdm prisão") */
+/* Auto-complete helpers */
+function getSuggestions(query){
+  const q = (query || '').trim().toLowerCase();
+  if(!q) return [];
+  return SUGGESTIONS
+    .filter(item => (item || '').toLowerCase().includes(q))
+    .slice(0,8);
+}
+
+function updateSuggestionsUI(list, query){
+  if(!query || !list.length){
+    searchGhost.textContent = '';
+    searchSuggest.style.display = 'none';
+    searchSuggest.innerHTML = '';
+    return;
+  }
+  searchGhost.textContent = 'Sugestão: ' + list[0];
+  searchSuggest.innerHTML = list.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+  searchSuggest.style.display = 'block';
+}
+
+/* busca com múltiplos termos + auto-complete */
 searchField.addEventListener('input', e=>{
-  const q = (e.target.value||'').trim().toLowerCase();
+  const raw = (e.target.value||'');
+  const q = raw.trim().toLowerCase();
+
+  const suggestions = getSuggestions(raw);
+  updateSuggestionsUI(suggestions, raw);
+
   if(!q){
     DATA = loadData();
     renderPublic(DATA);
@@ -429,6 +703,26 @@ searchField.addEventListener('input', e=>{
   });
 
   renderPublic(filtered);
+});
+
+/* clique na sugestão */
+searchSuggest.addEventListener('click', e=>{
+  const li = e.target.closest('li');
+  if(!li) return;
+  const value = li.textContent;
+  searchField.value = value;
+  searchSuggest.style.display = 'none';
+  searchGhost.textContent = '';
+  const ev = new Event('input');
+  searchField.dispatchEvent(ev);
+});
+
+/* fecha sugestões ao clicar fora */
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-box')){
+    searchSuggest.style.display = 'none';
+    searchGhost.textContent = '';
+  }
 });
 
 /* Ordenação de colunas por tabela (Infração / Punição) */
@@ -458,11 +752,39 @@ contentArea.addEventListener('click', (e)=>{
     return 0;
   });
 
-  // reseta animação de cascata na reordenação
   rows.forEach((row, idx)=>{
     row.style.animationDelay = (idx * 0.03) + 's';
     tbody.appendChild(row);
   });
+});
+
+/* ----------------------------
+    Theme toggle (claro/escuro)
+    ---------------------------- */
+const themeToggleBtn = document.getElementById('themeToggle');
+
+function setTheme(theme){
+  if(theme === 'light'){
+    document.body.classList.add('light');
+    themeToggleBtn.textContent = '🌙';
+    themeToggleBtn.title = 'Alternar para modo escuro';
+  }else{
+    document.body.classList.remove('light');
+    themeToggleBtn.textContent = '☀️';
+    themeToggleBtn.title = 'Alternar para modo claro';
+  }
+  localStorage.setItem('punicoes_theme', theme);
+}
+
+(function initTheme(){
+  const saved = localStorage.getItem('punicoes_theme');
+  const theme = saved === 'light' ? 'light' : 'dark';
+  setTheme(theme);
+})();
+
+themeToggleBtn.addEventListener('click', ()=>{
+  const isLight = document.body.classList.contains('light');
+  setTheme(isLight ? 'dark' : 'light');
 });
 
 /* ----------------------------
