@@ -296,16 +296,8 @@ const revealObserver = new IntersectionObserver((entries)=>{ entries.forEach(en=
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function renderPublic(dataset){
-
-  // --- animação ao pesquisar ---
-  contentArea.classList.remove("animate-search");
-  void contentArea.offsetWidth; // força o navegador a processar o reflow
-  contentArea.classList.add("animate-search");
-  // ------------------------------
-
   contentArea.innerHTML = '';
   const cats = [...new Set(dataset.map(x=>x.cat))];
-
   cats.forEach(cat=>{
     const sec = document.createElement('div'); sec.className='section';
     const title = document.createElement('div'); title.className='category'; title.textContent=cat;
