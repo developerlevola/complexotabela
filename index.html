@@ -66,10 +66,25 @@ header{
 
 /* table */
 .table{margin-top:14px;border-collapse:collapse;width:100%;background:linear-gradient(180deg,#0c0c0c,#070707);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.table th{background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800}
+.table th{background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800;cursor:pointer;user-select:none}
+.table th span.sort-label{font-weight:800}
+.table th span.sort-indicator{font-size:11px;opacity:.65;margin-left:4px}
 .table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:#fff}
 .category{margin-top:26px;font-size:20px;color:var(--orange);font-weight:800;margin-bottom:10px}
 .tr-hover:hover td{background:#0f0f0f}
+
+/* animação por linha (cascata) */
+.table tbody tr{
+  opacity:0;
+  transform:translateY(6px);
+}
+.table tbody tr.row-visible{
+  animation:rowFade .45s cubic-bezier(.2,.9,.3,1) forwards;
+}
+@keyframes rowFade{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
 
 /* modal / admin */
 .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1500}
@@ -290,6 +305,7 @@ const searchField = document.getElementById('searchField');
 
 let DATA = loadData();
 
+/* observer das sections */
 const revealObserver = new IntersectionObserver((entries)=>{
   entries.forEach(en=>{
     if(en.isIntersecting){
@@ -304,6 +320,24 @@ function observeSections(){
 
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+/* Badge com emoji antes do texto da punição */
+function formatPunicaoWithBadge(pun){
+  const lower = pun.toLowerCase();
+  let emoji = '';
+
+  if(lower.includes('banimento')){
+    emoji = '🔴 ';
+  }else if(lower.includes('prisão')){
+    emoji = '🔵 ';
+  }else if(lower.includes('advertência verbal')){
+    emoji = '🟣 ';
+  }else if(lower.includes('advertência')){
+    emoji = '🟡 ';
+  }
+
+  return emoji + escapeHtml(pun);
+}
+
 function renderPublic(dataset){
   // animação ao pesquisar / recriar tabelas
   contentArea.classList.remove('animate-search');
@@ -312,36 +346,59 @@ function renderPublic(dataset){
 
   contentArea.innerHTML = '';
   const cats = [...new Set(dataset.map(x=>x.cat))];
+
+  let rowIndex = 0; // para delay em cascata
+
   cats.forEach(cat=>{
-    const sec = document.createElement('div'); sec.className='section';
-    const title = document.createElement('div'); title.className='category'; title.textContent=cat;
+    const sec = document.createElement('div');
+    sec.className='section';
+
+    const title = document.createElement('div');
+    title.className='category';
+    title.textContent=cat;
     sec.appendChild(title);
 
-    const table = document.createElement('table'); table.className='table';
+    const table = document.createElement('table');
+    table.className='table';
     
     table.innerHTML = `
       <thead>
         <tr>
-          <th>Infração</th>
-          <th>Punição</th>
+          <th data-sort="inf">
+            <span class="sort-label">Infração</span>
+            <span class="sort-indicator">↕</span>
+          </th>
+          <th data-sort="pun">
+            <span class="sort-label">Punição</span>
+            <span class="sort-indicator">↕</span>
+          </th>
         </tr>
       </thead>
       <tbody></tbody>
     `;
+
     const tbody = table.querySelector('tbody'); 
     
-    dataset.filter(x=>x.cat===cat).forEach(item=>{
-      const tr = document.createElement('tr'); tr.className='tr-hover';
-      const tdInf = document.createElement('td');
-      tdInf.innerHTML = escapeHtml(item.inf);
-      tdInf.style.color = '#fff';
-      const tdPun = document.createElement('td');
-      tdPun.innerHTML = escapeHtml(item.pun);
-      tdPun.style.color = '#fff';
-      tr.appendChild(tdInf);
-      tr.appendChild(tdPun);
-      tbody.appendChild(tr);
-    });
+    dataset
+      .filter(x=>x.cat===cat)
+      .forEach(item=>{
+        const tr = document.createElement('tr');
+        tr.className='tr-hover row-visible';
+        tr.style.animationDelay = (rowIndex * 0.04) + 's';
+        rowIndex++;
+
+        const tdInf = document.createElement('td');
+        tdInf.innerHTML = escapeHtml(item.inf);
+        tdInf.style.color = '#fff';
+
+        const tdPun = document.createElement('td');
+        tdPun.innerHTML = formatPunicaoWithBadge(item.pun);
+        tdPun.style.color = '#fff';
+
+        tr.appendChild(tdInf);
+        tr.appendChild(tdPun);
+        tbody.appendChild(tr);
+      });
 
     sec.appendChild(table);
     contentArea.appendChild(sec);
@@ -354,14 +411,57 @@ function renderPublic(dataset){
 renderPublic(DATA);
 observeSections();
 
-/* search */
+/* busca com múltiplos termos (ex: "rdm prisão") */
 searchField.addEventListener('input', e=>{
   const q = (e.target.value||'').trim().toLowerCase();
-  if(!q){ DATA = loadData(); renderPublic(DATA); return; }
+  if(!q){
+    DATA = loadData();
+    renderPublic(DATA);
+    return;
+  }
+
+  const terms = q.split(/\s+/).filter(Boolean);
+
   const filtered = loadData().filter(x=>{
-    return x.inf.toLowerCase().includes(q) || x.pun.toLowerCase().includes(q) || x.cat.toLowerCase().includes(q);
+    const text = (x.inf + ' ' + x.pun + ' ' + x.cat).toLowerCase();
+    return terms.every(t => text.includes(t));
   });
+
   renderPublic(filtered);
+});
+
+/* Ordenação de colunas por tabela (Infração / Punição) */
+contentArea.addEventListener('click', (e)=>{
+  const th = e.target.closest('th[data-sort]');
+  if(!th) return;
+
+  const table = th.closest('table');
+  if(!table) return;
+
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if(rows.length === 0) return;
+
+  const key = th.dataset.sort; // 'inf' ou 'pun'
+  const cellIndex = key === 'inf' ? 0 : 1;
+
+  const currentDir = th.dataset.dir === 'asc' ? 'asc' : (th.dataset.dir === 'desc' ? 'desc' : null);
+  const newDir = !currentDir || currentDir === 'desc' ? 'asc' : 'desc';
+  th.dataset.dir = newDir;
+
+  rows.sort((a,b)=>{
+    const aText = (a.cells[cellIndex].innerText || '').toLowerCase();
+    const bText = (b.cells[cellIndex].innerText || '').toLowerCase();
+    if(aText < bText) return newDir === 'asc' ? -1 : 1;
+    if(aText > bText) return newDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // reseta animação de cascata na reordenação
+  rows.forEach((row, idx)=>{
+    row.style.animationDelay = (idx * 0.03) + 's';
+    tbody.appendChild(row);
+  });
 });
 
 /* ----------------------------
@@ -374,8 +474,16 @@ const adminPassInput = document.getElementById('adminPass');
 const loginBtn = document.getElementById('loginBtn');
 const loginClose = document.getElementById('loginClose');
 
-openAdminBtn.addEventListener('click', ()=>{ adminPassInput.value=''; loginModal.style.display='flex'; loginModal.setAttribute('aria-hidden','false'); setTimeout(()=>adminPassInput.focus(),80); });
-loginClose.addEventListener('click', ()=>{ loginModal.style.display='none'; loginModal.setAttribute('aria-hidden','true'); });
+openAdminBtn.addEventListener('click', ()=>{
+  adminPassInput.value='';
+  loginModal.style.display='flex';
+  loginModal.setAttribute('aria-hidden','false');
+  setTimeout(()=>adminPassInput.focus(),80);
+});
+loginClose.addEventListener('click', ()=>{
+  loginModal.style.display='none';
+  loginModal.setAttribute('aria-hidden','true');
+});
 
 loginBtn.addEventListener('click', async ()=>{
   const val = adminPassInput.value || '';
@@ -393,7 +501,12 @@ loginBtn.addEventListener('click', async ()=>{
 
 /* close modal if clicked outside */
 document.querySelectorAll('.modal-back').forEach(back=>{
-  back.addEventListener('click', (e)=>{ if(e.target === back){ back.style.display='none'; back.setAttribute('aria-hidden','true'); }});
+  back.addEventListener('click', (e)=>{
+    if(e.target === back){
+      back.style.display='none';
+      back.setAttribute('aria-hidden','true');
+    }
+  });
 });
 
 /* token utils (Web Crypto SHA-256) */
@@ -415,8 +528,14 @@ document.getElementById('regenTokenBtn').addEventListener('click', async ()=>{
   pushLog('TOKEN','Token regenerado');
   alert('Token regenerado.');
 });
-document.getElementById('showTokenBtn').addEventListener('click', ()=>{ alert(sessionStorage.getItem('punicoes_token') || 'Não autenticado.'); });
-document.getElementById('revokeTokenBtn').addEventListener('click', ()=>{ sessionStorage.removeItem('punicoes_token'); pushLog('TOKEN','Token revogado'); alert('Token revogado.'); });
+document.getElementById('showTokenBtn').addEventListener('click', ()=>{
+  alert(sessionStorage.getItem('punicoes_token') || 'Não autenticado.');
+});
+document.getElementById('revokeTokenBtn').addEventListener('click', ()=>{
+  sessionStorage.removeItem('punicoes_token');
+  pushLog('TOKEN','Token revogado');
+  alert('Token revogado.');
+});
 
 /* ----------------------------
     Admin Panel Logic (editor / CRUD / import-export / logs)
@@ -433,14 +552,21 @@ const clearLogsBtn = document.getElementById('clearLogsBtn');
 const exportLogsBtn = document.getElementById('exportLogsBtn');
 
 function openAdminPanel(){
-  if(!tokenValid()){ return alert('Sessão inválida. Faça login novamente.'); }
+  if(!tokenValid()){
+    return alert('Sessão inválida. Faça login novamente.');
+  }
   DATA = loadData();
   renderAdminList();
   renderLogs();
-  adminModal.style.display='flex'; adminModal.setAttribute('aria-hidden','false');
+  adminModal.style.display='flex';
+  adminModal.setAttribute('aria-hidden','false');
   pushLog('OPEN_ADMIN','Painel aberto');
 }
-closeAdminBtn.addEventListener('click', ()=>{ adminModal.style.display='none'; adminModal.setAttribute('aria-hidden','true'); pushLog('CLOSE_ADMIN','Painel fechado'); });
+closeAdminBtn.addEventListener('click', ()=>{
+  adminModal.style.display='none';
+  adminModal.setAttribute('aria-hidden','true');
+  pushLog('CLOSE_ADMIN','Painel fechado');
+});
 
 function renderAdminList(){
   adminListEl.innerHTML = '';
@@ -484,11 +610,18 @@ function renderAdminList(){
         pushLog('DELETE', JSON.stringify(removed));
         renderAdminList();
       } else if(action==='up' && i>0){
-        const a = DATA.splice(i,1)[0]; DATA.splice(i-1,0,a); renderAdminList();
+        const a = DATA.splice(i,1)[0];
+        DATA.splice(i-1,0,a);
+        renderAdminList();
       } else if(action==='down' && i < DATA.length-1){
-        const a = DATA.splice(i,1)[0]; DATA.splice(i+1,0,a); renderAdminList();
+        const a = DATA.splice(i,1)[0];
+        DATA.splice(i+1,0,a);
+        renderAdminList();
       } else if(action==='dup'){
-        const copy = JSON.parse(JSON.stringify(DATA[i])); DATA.splice(i+1,0,copy); pushLog('DUPLICATE',JSON.stringify(copy)); renderAdminList();
+        const copy = JSON.parse(JSON.stringify(DATA[i]));
+        DATA.splice(i+1,0,copy);
+        pushLog('DUPLICATE',JSON.stringify(copy));
+        renderAdminList();
       } else if(action==='saveone'){
         saveData(DATA);
         pushLog('SAVE_ONE', `index:${i}`);
@@ -545,7 +678,11 @@ exportBtn.addEventListener('click', ()=>{
   const arr = loadData();
   const blob = new Blob([JSON.stringify(arr, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'punicoes_export.json'; a.click(); URL.revokeObjectURL(url);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'punicoes_export.json';
+  a.click();
+  URL.revokeObjectURL(url);
   pushLog('EXPORT', `count:${arr.length}`);
 });
 
@@ -573,8 +710,15 @@ function renderLogs(){
   const logs = loadLogs();
   logListEl.innerHTML = '';
   logs.forEach(l=>{
-    const div = document.createElement('div'); div.className='log-item';
-    div.innerHTML = `<div style="color:#9f9f9f;font-size:12px">${new Date(l.ts).toLocaleString()}</div><div style="margin-top:4px">${escapeHtml(l.action)} — ${escapeHtml(l.details||'')}</div>`;
+    const div = document.createElement('div');
+    div.className='log-item';
+    div.innerHTML = `
+      <div style="color:#9f9f9f;font-size:12px">
+        ${new Date(l.ts).toLocaleString()}
+      </div>
+      <div style="margin-top:4px">
+        ${escapeHtml(l.action)} — ${escapeHtml(l.details||'')}
+      </div>`;
     logListEl.appendChild(div);
   });
 }
@@ -588,7 +732,11 @@ exportLogsBtn.addEventListener('click', ()=>{
   const logs = loadLogs();
   const blob = new Blob([JSON.stringify(logs, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'punicoes_logs.json'; a.click(); URL.revokeObjectURL(url);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'punicoes_logs.json';
+  a.click();
+  URL.revokeObjectURL(url);
   pushLog('EXPORT_LOGS', `count:${logs.length}`);
 });
 
@@ -598,9 +746,18 @@ renderLogs();
 /* final safety: if storage corrupted, reset */
 try{
   const check = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-  if(check && !Array.isArray(check)){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
-}catch(e){ localStorage.removeItem(STORAGE_KEY); saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA))); DATA = loadData(); renderPublic(DATA); }
-
+  if(check && !Array.isArray(check)){
+    localStorage.removeItem(STORAGE_KEY);
+    saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA)));
+    DATA = loadData();
+    renderPublic(DATA);
+  }
+}catch(e){
+  localStorage.removeItem(STORAGE_KEY);
+  saveData(JSON.parse(JSON.stringify(ORIGINAL_DATA)));
+  DATA = loadData();
+  renderPublic(DATA);
+}
 </script>
 </body>
 </html>
