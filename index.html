@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Complexo RJ — Tabela de Punições</title>
 <link rel="icon" href="icon.gif" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --orange:#ffaa01;
@@ -24,44 +24,6 @@ body{
     linear-gradient(180deg,#050505 0%, #070707 100%);
   color:#fff;
   -webkit-font-smoothing:antialiased;
-  transition:background .3s ease,color .3s ease;
-}
-
-/* tema claro */
-body.light-theme{
-  background:
-    radial-gradient(800px 200px at 10% 10%, rgba(255,170,1,0.12), transparent),
-    linear-gradient(180deg,#f7f7f9,#e3e3ea);
-  color:#111;
-}
-body.light-theme .search-box{
-  background:#ffffff;
-  border-color:rgba(0,0,0,0.06);
-  box-shadow:0 10px 26px rgba(0,0,0,0.12);
-}
-body.light-theme .table{
-  background:linear-gradient(180deg,#ffffff,#f5f5f7);
-  box-shadow:0 10px 26px rgba(0,0,0,0.10);
-}
-body.light-theme .table td{
-  border-bottom:1px solid rgba(0,0,0,0.06);
-  color:#111;
-}
-body.light-theme .tr-hover:hover td{
-  background:rgba(0,0,0,0.03);
-}
-body.light-theme header{
-  border-bottom-color:var(--orange);
-}
-body.light-theme .modal{
-  background:linear-gradient(180deg,#ffffff,#f4f4f6);
-  color:#111;
-}
-body.light-theme .admin-item{
-  background:#f7f7f9;
-}
-body.light-theme .log-list{
-  background:#f3f3f7;
 }
 
 /* header/banner */
@@ -77,14 +39,11 @@ header{
 .brand h1{margin:0;font-size:26px;color:var(--orange);letter-spacing:.4px;text-shadow:0 0 8px rgba(255,170,1,0.08)}
 .brand p{margin:0;font-size:13px;color:#d6d6d6}
 
-/* admin + theme button top-right */
+/* admin button top-right */
 .header-actions{display:flex;gap:10px;align-items:center}
-.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:13px}
+.btn{border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
 .btn-primary{background:var(--orange);color:#000;font-weight:800;box-shadow:0 8px 36px rgba(255,170,1,0.12)}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--orange)}
-body.light-theme .btn-ghost{
-  border-color:rgba(0,0,0,0.12);
-}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--orange)}
 
 /* main layout */
 .wrap{max-width:1150px;margin:18px auto;padding:12px 20px}
@@ -100,80 +59,84 @@ body.light-theme .btn-ghost{
 }
 .title{font-size:28px;color:var(--orange);font-weight:800;margin-bottom:8px;text-shadow:0 0 8px rgba(255,170,1,0.06)}
 .lead{color:#d4d4d4;line-height:1.6}
-body.light-theme .lead{color:#444}
 
 /* search */
 .search-wrap{display:flex;justify-content:center;margin:6px 0 18px}
 .search-box{
-  width:100%;max-width:720px;background:#0f0f0f;border-radius:12px;padding:10px 12px;
-  border:1px solid rgba(255,255,255,0.06);
+  width:100%;
+  max-width:720px;
+  background:#0f0f0f;
+  border-radius:12px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,0.02);
   box-shadow:inset 0 6px 18px rgba(0,0,0,0.6);
-  position:relative;
+  position:relative;          /* cria contexto pro dropdown */
+  z-index:40;                 /* FICA POR CIMA DAS TABELAS */
 }
 .search-box input{
-  width:100%;background:transparent;border:0;color:#fff;
-  padding:6px;font-size:16px;outline:none;
+  width:100%;
+  background:transparent;
+  border:0;
+  color:#fff;
+  padding:6px;
+  font-size:16px;
+  outline:none;
 }
-body.light-theme .search-box input{color:#111}
 
-/* dropdown de sugestões */
-.search-suggest{
+/* dropdown de sugestões de busca */
+.search-suggestions{
   position:absolute;
-  left:0;right:0;
   top:100%;
+  left:0;
+  right:0;
   margin-top:6px;
-  background:#050505;
-  border-radius:10px;
+  background:#0d0d0d;
+  border-radius:12px;
   border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 18px 45px rgba(0,0,0,0.75);
-  list-style:none;
-  padding:6px 0;
-  max-height:220px;
+  box-shadow:0 18px 45px rgba(0,0,0,0.9);
+  max-height:260px;
   overflow:auto;
-  z-index:9999;
+  z-index:45;                /* acima da search-box e das tabelas */
+}
+.search-suggestions.hidden{
   display:none;
 }
-body.light-theme .search-suggest{
-  background:#ffffff;
-  border-color:rgba(0,0,0,0.08);
-  box-shadow:0 18px 45px rgba(0,0,0,0.18);
-}
-.search-suggest li{
-  padding:8px 12px;
+.search-suggestions-item{
+  padding:10px 12px;
   font-size:13px;
-  color:#f5f5f5;
-  cursor:pointer;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:6px;
-  transition:background .18s ease, transform .18s ease, opacity .18s ease;
+  align-items:center;
+  cursor:pointer;
 }
-body.light-theme .search-suggest li{color:#222}
-.search-suggest li span.hint{
-  opacity:.6;
+.search-suggestions-item:hover{
+  background:#141414;
+}
+.search-suggestions-item span.helper{
   font-size:11px;
-}
-.search-suggest li:hover{
-  background:rgba(255,255,255,0.06);
-  transform:translateY(-1px);
-}
-body.light-theme .search-suggest li:hover{
-  background:rgba(0,0,0,0.04);
+  opacity:.6;
 }
 
 /* table */
 .table{
-  margin-top:14px;border-collapse:collapse;width:100%;
+  margin-top:14px;
+  border-collapse:collapse;
+  width:100%;
   background:linear-gradient(180deg,#0c0c0c,#070707);
   border-radius:12px;
-  overflow:visible;
+  overflow:hidden;
   box-shadow:0 10px 30px rgba(0,0,0,0.6);
   position:relative;
+  z-index:1;                 /* abaixo do dropdown de busca */
 }
 .table th{
-  background:var(--orange);color:#000;padding:12px 14px;text-align:left;font-weight:800;
-  cursor:pointer;user-select:none;position:relative;z-index:1;
+  background:var(--orange);
+  color:#000;
+  padding:12px 14px;
+  text-align:left;
+  font-weight:800;
+  cursor:pointer;
+  user-select:none;
 }
 .table th span.sort-label{font-weight:800}
 .table th span.sort-indicator{font-size:11px;opacity:.65;margin-left:4px}
@@ -181,7 +144,6 @@ body.light-theme .search-suggest li:hover{
   padding:12px 14px;
   border-bottom:1px solid rgba(255,255,255,0.03);
   color:#fff;
-  position:relative;
 }
 .category{margin-top:26px;font-size:20px;color:var(--orange);font-weight:800;margin-bottom:10px}
 .tr-hover:hover td{background:#0f0f0f}
@@ -199,69 +161,26 @@ body.light-theme .search-suggest li:hover{
   to{opacity:1; transform:translateY(0);}
 }
 
-/* badge + tooltip */
-.badge{
-  display:inline-flex;
+/* modal / admin */
+.modal-back{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(5px);
+  display:none;
   align-items:center;
   justify-content:center;
-  min-width:20px;
-  height:20px;
-  border-radius:999px;
-  font-size:11px;
-  margin-right:6px;
-  padding:0 6px;
-  background:rgba(255,255,255,0.08);
-  box-shadow:0 0 12px rgba(0,0,0,0.7);
-  position:relative;
+  z-index:1500;
 }
-.badge-ban{background:rgba(255,0,0,0.15);}
-.badge-prisao{background:rgba(0,140,255,0.15);}
-.badge-adv{background:rgba(255,215,0,0.15);}
-.badge-adv-verbal{background:rgba(186,85,211,0.18);}
-
-/* tooltip simples */
-.badge[data-tooltip]::after{
-  content:attr(data-tooltip);
-  position:absolute;
-  bottom:130%;
-  left:50%;
-  transform:translateX(-50%);
-  background:#000;
-  color:#fff;
-  font-size:11px;
-  padding:4px 8px;
-  border-radius:6px;
-  white-space:nowrap;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .18s ease, transform .18s ease;
-  z-index:99999;
-  box-shadow:0 10px 26px rgba(0,0,0,0.7);
+.modal{
+  background:linear-gradient(180deg,#0b0b0b,#0a0a0a);
+  border-radius:12px;
+  padding:18px;
+  max-width:1100px;
+  width:96%;
+  box-shadow:0 14px 40px rgba(0,0,0,0.7),0 0 28px rgba(255,170,1,0.08);
+  color:#ddd;
 }
-.badge[data-tooltip]::before{
-  content:"";
-  position:absolute;
-  bottom:120%;
-  left:50%;
-  transform:translateX(-50%);
-  border-width:6px;
-  border-style:solid;
-  border-color:#000 transparent transparent transparent;
-  opacity:0;
-  transition:opacity .18s ease;
-  z-index:99998;
-}
-.badge:hover::after,
-.badge:hover::before{
-  opacity:1;
-}
-.badge:hover::after{
-  transform:translate(-50%,-2px);
-}
-
-/* modal / admin */
-.modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1500}
-.modal{background:linear-gradient(180deg,#0b0b0b,#0a0a0a);border-radius:12px;padding:18px;max-width:1100px;width:96%;box-shadow:0 14px 40px rgba(0,0,0,0.7),0 0 28px rgba(255,170,1,0.08);color:#ddd}
 
 /* admin list/editor */
 .admin-list{max-height:55vh;overflow:auto;padding-right:6px}
@@ -312,7 +231,6 @@ body.light-theme .search-suggest li:hover{
     </div>
 
     <div class="header-actions">
-      <button id="themeToggle" class="btn btn-ghost" title="Alternar tema">☀️</button>
       <button id="openAdminBtn" class="btn btn-primary" title="Painel Admin">Painel Admin</button>
     </div>
   </div>
@@ -321,13 +239,16 @@ body.light-theme .search-suggest li:hover{
 <main class="wrap">
   <section class="section">
     <div class="title">Tabela de Punições</div>
-    <p class="lead">A Tabela de Punições do Complexo RJ foi criada com o objetivo de manter a ordem, disciplina e o bom funcionamento da nossa comunidade. Cada membro deve respeitar as diretrizes para um ambiente justo e organizado.</p>
+    <p class="lead">
+      A Tabela de Punições do Complexo RJ foi criada com o objetivo de manter a ordem, disciplina e o bom funcionamento da nossa comunidade.
+      Cada membro deve respeitar as diretrizes para um ambiente justo e organizado.
+    </p>
   </section>
 
   <section class="section search-wrap">
     <div class="search-box">
-      <input id="searchField" placeholder="Pesquisar infração, punição ou categoria (ex.: RDM, Banimento)..." autocomplete="off" />
-      <ul id="searchSuggest" class="search-suggest"></ul>
+      <input id="searchField" placeholder="Pesquisar infração, punição ou categoria (ex.: RDM, Banimento)..." />
+      <div id="searchSuggestions" class="search-suggestions hidden"></div>
     </div>
   </section>
 
@@ -431,7 +352,7 @@ const ORIGINAL_DATA = [
   {cat:"Tickets",inf:"MAL USO DO CHAT",pun:"50 meses ou Advertência Verbal"},
   {cat:"Tickets",inf:"REGRAS DE SAFE ZONE",pun:"Advertência Verbal + 100 meses"},
   {cat:"Tickets",inf:"ANTI AMOR À VIDA",pun:"Advertência Verbal"},
-  {cat:"Tickets",inf:"ABUSO DE BUG",pun:"Advertência Verbal + 300 months"},
+  {cat:"Tickets",inf:"ABUSO DE BUG",pun:"Advertência Verbal + 300 meses"},
   {cat:"Tickets",inf:"BIND EM AÇÃO",pun:"Advertência 1 + 1000 meses"},
   {cat:"Tickets",inf:"FAKE EMPREGO",pun:"100 meses ou Advertência Verbal"},
   {cat:"Tickets",inf:"FORÇAR AÇÃO",pun:"Advertência Verbal + 1000 meses"},
@@ -473,34 +394,12 @@ function loadLogs(){ try{ return JSON.parse(localStorage.getItem(LOGS_KEY) || '[
 function pushLog(action, details){ const logs=loadLogs(); logs.unshift({ts:new Date().toISOString(), action, details}); localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); }
 
 /* ----------------------------
-    Tema claro/escuro
-    ---------------------------- */
-const themeToggle = document.getElementById('themeToggle');
-function applyTheme(theme){
-  if(theme === 'light'){
-    document.body.classList.add('light-theme');
-    themeToggle.textContent = '🌙';
-  }else{
-    document.body.classList.remove('light-theme');
-    themeToggle.textContent = '☀️';
-  }
-}
-const savedTheme = localStorage.getItem('punicoes_theme') || 'dark';
-applyTheme(savedTheme);
-
-themeToggle.addEventListener('click', ()=>{
-  const current = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-  const next = current === 'light' ? 'dark' : 'light';
-  localStorage.setItem('punicoes_theme', next);
-  applyTheme(next);
-});
-
-/* ----------------------------
     Public render & search
     ---------------------------- */
 const contentArea = document.getElementById('contentArea');
 const searchField = document.getElementById('searchField');
-const searchSuggest = document.getElementById('searchSuggest');
+const searchSuggestions = document.getElementById('searchSuggestions');
+const searchBox = document.querySelector('.search-box');
 
 let DATA = loadData();
 
@@ -519,40 +418,24 @@ function observeSections(){
 
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-/* Badge com emoji e tooltip */
+/* Badge com emoji antes do texto da punição */
 function formatPunicaoWithBadge(pun){
   const lower = pun.toLowerCase();
   let emoji = '';
-  let tooltip = '';
-  let badgeClass = '';
 
   if(lower.includes('banimento')){
-    emoji = '🔴';
-    tooltip = 'Banimento';
-    badgeClass = 'badge-ban';
+    emoji = '🔴 ';
   }else if(lower.includes('prisão')){
-    emoji = '🔵';
-    tooltip = 'Prisão';
-    badgeClass = 'badge-prisao';
+    emoji = '🔵 ';
   }else if(lower.includes('advertência verbal')){
-    emoji = '🟣';
-    tooltip = 'Advertência verbal';
-    badgeClass = 'badge-adv-verbal';
+    emoji = '🟣 ';
   }else if(lower.includes('advertência')){
-    emoji = '🟡';
-    tooltip = 'Advertência';
-    badgeClass = 'badge-adv';
+    emoji = '🟡 ';
   }
 
-  if(!emoji){
-    return '<span class="pun-text">' + escapeHtml(pun) + '</span>';
-  }
-
-  return '<span class="badge ' + badgeClass + '" data-tooltip="' + tooltip + '">' + emoji + '</span>' +
-         '<span class="pun-text">' + escapeHtml(pun) + '</span>';
+  return emoji + escapeHtml(pun);
 }
 
-/* render público */
 function renderPublic(dataset){
   // animação ao pesquisar / recriar tabelas
   contentArea.classList.remove('animate-search');
@@ -562,7 +445,7 @@ function renderPublic(dataset){
   contentArea.innerHTML = '';
   const cats = [...new Set(dataset.map(x=>x.cat))];
 
-  let rowIndex = 0; // para delay em cascata geral
+  let rowIndex = 0; // delay em cascata
 
   cats.forEach(cat=>{
     const sec = document.createElement('div');
@@ -605,10 +488,12 @@ function renderPublic(dataset){
         const tdInf = document.createElement('td');
         tdInf.innerHTML = escapeHtml(item.inf);
         tdInf.style.color = '#fff';
+        tdInf.title = item.inf;
 
         const tdPun = document.createElement('td');
         tdPun.innerHTML = formatPunicaoWithBadge(item.pun);
         tdPun.style.color = '#fff';
+        tdPun.title = item.pun;
 
         tr.appendChild(tdInf);
         tr.appendChild(tdPun);
@@ -622,58 +507,66 @@ function renderPublic(dataset){
   observeSections();
 }
 
-/* initial render */
-renderPublic(DATA);
-observeSections();
+/* funções do dropdown de sugestão */
+function hideSuggestions(){
+  searchSuggestions.classList.add('hidden');
+}
 
-/* sugestões de busca (dropdown) */
-function updateSuggestions(q){
-  searchSuggest.innerHTML = '';
-  if(!q){
-    searchSuggest.style.display = 'none';
+function buildSuggestions(query){
+  const term = (query || '').trim().toLowerCase();
+  if(!term){
+    hideSuggestions();
     return;
   }
-  const lower = q.toLowerCase();
+
+  const base = loadData();
   const seen = new Set();
   const list = [];
 
-  loadData().forEach(x=>{
-    [x.inf,x.pun,x.cat].forEach(src=>{
-      const txt = String(src || '');
-      const low = txt.toLowerCase();
-      if(low.includes(lower) && !seen.has(low)){
-        seen.add(low);
-        list.push(txt);
-      }
-    });
-  });
+  for(const item of base){
+    const label = item.inf;
+    if(label.toLowerCase().includes(term) && !seen.has(label)){
+      seen.add(label);
+      list.push(label);
+      if(list.length >= 6) break;
+    }
+  }
 
-  const top = list.slice(0,8);
-  if(top.length === 0){
-    searchSuggest.style.display = 'none';
+  if(list.length === 0){
+    hideSuggestions();
     return;
   }
 
-  top.forEach(item=>{
-    const li = document.createElement('li');
-    li.innerHTML = '<span>' + escapeHtml(item) + '</span><span class="hint">enter para aplicar</span>';
-    li.addEventListener('mousedown', ()=>{
-      searchField.value = item;
-      searchField.dispatchEvent(new Event('input'));
-      searchSuggest.style.display = 'none';
+  searchSuggestions.innerHTML = '';
+  list.forEach(label=>{
+    const row = document.createElement('div');
+    row.className = 'search-suggestions-item';
+
+    const left = document.createElement('span');
+    left.textContent = label;
+
+    const right = document.createElement('span');
+    right.className = 'helper';
+    right.textContent = 'enter para aplicar';
+
+    row.appendChild(left);
+    row.appendChild(right);
+
+    row.addEventListener('click', ()=>{
+      searchField.value = label;
+      runSearch(label);
+      hideSuggestions();
     });
-    searchSuggest.appendChild(li);
+
+    searchSuggestions.appendChild(row);
   });
 
-  searchSuggest.style.display = 'block';
+  searchSuggestions.classList.remove('hidden');
 }
 
 /* busca com múltiplos termos (ex: "rdm prisão") */
-searchField.addEventListener('input', e=>{
-  const q = (e.target.value||'').trim().toLowerCase();
-
-  updateSuggestions(q);
-
+function runSearch(value){
+  const q = (value || '').trim().toLowerCase();
   if(!q){
     DATA = loadData();
     renderPublic(DATA);
@@ -688,17 +581,29 @@ searchField.addEventListener('input', e=>{
   });
 
   renderPublic(filtered);
-});
+}
 
-/* fechar dropdown ao clicar fora ou apertar Esc */
-document.addEventListener('click', (e)=>{
-  if(!searchSuggest.contains(e.target) && e.target !== searchField){
-    searchSuggest.style.display = 'none';
+/* initial render */
+renderPublic(DATA);
+observeSections();
+
+/* eventos da busca */
+searchField.addEventListener('input', e=>{
+  const value = e.target.value;
+  runSearch(value);
+  buildSuggestions(value);
+});
+searchField.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){
+    runSearch(searchField.value);
+    hideSuggestions();
   }
 });
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    searchSuggest.style.display = 'none';
+
+/* fecha dropdown clicando fora */
+document.addEventListener('click', e=>{
+  if(!searchBox.contains(e.target)){
+    hideSuggestions();
   }
 });
 
