@@ -302,6 +302,11 @@ body.light-theme .search-suggest li:hover{
   .modal{width:94%}
   .search-box{max-width:92%}
 }
+
+.card{background:#111;padding:16px;border-radius:14px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,0.35);}
+.card-title{font-weight:600;font-size:15px;margin-bottom:6px;color:#fff;}
+.card-pun{opacity:.85;font-size:14px;color:#ddd;}
+
 </style>
 
 <style>
@@ -569,117 +574,36 @@ function formatPunicaoWithBadge(pun){
 }
 
 
-/* Mapeamento e descrições das categorias */
-const CAT_MAP = {
-  "Prisão STAFF":"Categoria 1",
-  "Tickets":"Categoria 2",
-  "Banimento com UNBAN":"Categoria 3",
-  "Banimento Permanente":"Categoria 4"
-};
-
-const CATEGORY_INFO = {
-  "Categoria 1": "",
-  "Categoria 2": `
-    <p><strong>Tickets:</strong></p>
-    <p>Punições passíveis de advertências, prisões e multas.<br>
-    A equipe do Complexo RJ se reserva o direito de avaliar cada caso individualmente, sempre buscando justiça e equilíbrio para manter a qualidade do roleplay e o respeito entre todos os membros.</p>
-  `,
-  "Categoria 3": `
-    <p>Punições passíveis de Banimento com direito a retorno através do UNBAN.</p>
-  `,
-  "Categoria 4": `
-    <p>Punições passíveis de Banimento permanente imediato e sem direito a UNBAN do site.</p>
-    <br>
-    <p><strong>Observação:</strong><br>
-    O DARK a depender do caso pode ocorrer variações entre um banimento temporário em dias a um banimento permanente.<br>
-    Em caso de reincidência será aplicado o banimento PERMANENTE.</p>
-    <p>A equipe do Complexo RJ se reserva o direito de avaliar cada caso individualmente, sempre buscando justiça e equilíbrio para manter a qualidade do roleplay e o respeito entre todos os membros.</p>
-  `
-};
-
 /* render público */
 function renderPublic(dataset){
-  // animação ao pesquisar / recriar tabelas
-  contentArea.classList.remove('animate-search');
-  void contentArea.offsetWidth;
-  contentArea.classList.add('animate-search');
-
-  contentArea.innerHTML = '';
-  const cats = [...new Set(dataset.map(x=>x.cat))];
-
-  let rowIndex = 0; // para delay em cascata geral
-
+  contentArea.innerHTML='';
+  const cats=[...new Set(dataset.map(x=>x.cat))];
   cats.forEach(cat=>{
-    const sec = document.createElement('div');
+    const sec=document.createElement('div');
     sec.className='section';
-
-    const title = document.createElement('div');
+    const displayCat=CAT_MAP[cat]||cat;
+    const title=document.createElement('div');
     title.className='category';
-    const displayCat = CAT_MAP[cat] || cat;
     title.textContent=displayCat;
-
-    if (CATEGORY_INFO[displayCat]) {
-      const desc=document.createElement("div");
-      desc.className="cat-desc";
+    sec.appendChild(title);
+    if(CATEGORY_INFO[displayCat]){
+      const desc=document.createElement('div');
+      desc.className='cat-desc';
       desc.innerHTML=CATEGORY_INFO[displayCat];
       sec.appendChild(desc);
     }
-    sec.appendChild(title);
-
-    const table = document.createElement('table');
-    table.className='table';
-    
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th data-sort="inf">
-            <span class="sort-label">Infração</span>
-            <span class="sort-indicator">↕</span>
-          </th>
-          <th data-sort="pun">
-            <span class="sort-label">Punição</span>
-            <span class="sort-indicator">↕</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    `;
-
-    const tbody = table.querySelector('tbody'); 
-    
-    dataset
-      .filter(x=>x.cat===cat)
-      .forEach(item=>{
-        const tr = document.createElement('tr');
-        tr.className='tr-hover row-visible';
-        tr.style.animationDelay = (rowIndex * 0.04) + 's';
-        rowIndex++;
-
-        const tdInf = document.createElement('td');
-        tdInf.innerHTML = escapeHtml(item.inf);
-        tdInf.style.color = '#fff';
-
-        const tdPun = document.createElement('td');
-        tdPun.innerHTML = formatPunicaoWithBadge(item.pun);
-        tdPun.style.color = '#fff';
-
-        tr.appendChild(tdInf);
-        tr.appendChild(tdPun);
-        tbody.appendChild(tr);
-      });
-
-    sec.appendChild(table);
+    dataset.filter(x=>x.cat===cat).forEach(item=>{
+      const card=document.createElement('div');
+      card.className='card';
+      card.innerHTML=`<div class="card-title">${escapeHtml(item.inf)}</div>
+      <div class="card-pun">${escapeHtml(item.pun)}</div>`;
+      sec.appendChild(card);
+    });
     contentArea.appendChild(sec);
   });
-
   observeSections();
+}
 
-  const aviso=document.createElement("div");
-  aviso.className="section";
-  aviso.innerHTML=`<h2 style="color:var(--orange)">AVISO IMPORTANTE!</h2>
-  <p>As punições apresentadas são referências gerais e podem variar conforme:<br>
-  • Histórico disciplinar do jogador<br>• Gravidade e contexto específico<br>• Avaliação da staff<br>• Reincidência ou primeira infração</p>`;
-  contentArea.appendChild(aviso);
 }
 
 /* initial render */
